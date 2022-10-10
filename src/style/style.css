@@ -105,3 +105,12 @@ a {
   color: inherit; 
 }
 
+/* Utilities */
+.icon {
+  width: 48px;
+}
+
+/* Header bar */
+header {
+  display: flex;
+}

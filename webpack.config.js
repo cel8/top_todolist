@@ -5,7 +5,12 @@ const HtmlWebpackPlugin = require('html-webpack-plugin');
 module.exports = {
   mode: 'development',
   entry: {
+    uiController:       './src/controller/ui-controller.js',
     index:              './src/index.js',
+    project:            './src/modules/project.js',
+    todo:               './src/modules/todo.js',
+    button:             './src/utilities/button.js',
+    domManager:         './src/utilities/dom-manager.js',
   },
   devtool: 'inline-source-map',
   plugins: [

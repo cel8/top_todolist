@@ -1,8 +1,8 @@
 export class Project {
-  constructor(name, description) {
-    this.name = name;
+  constructor(title, description) {
+    this.title = title;
     this.description = description || "";
   }
-  get getName() { return this.name; }
+  get getTitle() { return this.title; }
   get getDescription() { return this.description; }
 }

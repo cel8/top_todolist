@@ -47,6 +47,7 @@ export class UiController {
       inputProject.setAttribute('type', 'text');
       inputProject.setAttribute('name', nameTitleProject);
       inputProject.setAttribute('placeholder', 'Project name');
+      inputProject.required = true;
       const btnCancel = domManager.createAddNode('button', formAddProject, 'btnForm', null, 'Cancel');
       btnCancel.setAttribute('type', 'button');
       btnCancel.onclick = () => {
@@ -58,6 +59,7 @@ export class UiController {
       formAddProject.onsubmit = (e) => {
         e.preventDefault();
         console.log('Project title: ' + inputProject.value);
+        this.projectController.doCreateProject(inputProject.value);
       }
     }
     domManager.addNodeChild(body, nav);

@@ -5,12 +5,15 @@ const HtmlWebpackPlugin = require('html-webpack-plugin');
 module.exports = {
   mode: 'development',
   entry: {
-    uiController:       './src/controller/ui-controller.js',
+    projectController:  './src/controller/project-controller.js',
+    storageController:  './src/controller/storage-controller.js',
     index:              './src/index.js',
     project:            './src/modules/project.js',
     todo:               './src/modules/todo.js',
     button:             './src/utilities/button.js',
     domManager:         './src/utilities/dom-manager.js',
+    uiController:       './src/view/ui-controller.js',
+    uiProjectCtrl:      './src/view/ui-project-controller.js'
   },
   devtool: 'inline-source-map',
   plugins: [
@@ -35,6 +38,7 @@ module.exports = {
       Modules: path.resolve(__dirname, 'src/modules'),
       Style: path.resolve(__dirname, 'src/style'),
       Utilities: path.resolve(__dirname, 'src/utilities'),
+      View: path.resolve(__dirname, 'src/view'),
     },
   },
   module: {

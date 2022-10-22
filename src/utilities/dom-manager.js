@@ -101,8 +101,7 @@ export function removeAllChildNodes(parent) {
   }
 }
 
-export function toggleDisplay(nodeName, nextDisplay = undefined) {
-  const node = document.querySelector(nodeName);
+export function toggleDisplayByNode(node, nextDisplay = undefined) {
   if(node) {
     if(node.dataset.prevDisplay === undefined) {
       node.dataset.prevDisplay = nextDisplay ? nextDisplay : node.style.display;
@@ -112,4 +111,9 @@ export function toggleDisplay(nodeName, nextDisplay = undefined) {
                                                          : node.dataset.prevDisplay;
     node.dataset.prevDisplay = prevDisplay;
   }
+}
+
+export function toggleDisplay(nodeName, nextDisplay = undefined) {
+  const node = document.querySelector(nodeName);
+  toggleDisplayByNode(node, nextDisplay);
 }

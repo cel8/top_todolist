@@ -1,5 +1,5 @@
 import _ from 'lodash';
-import { UiController } from 'Controller/ui-controller.js';
+import { UiController } from 'View/ui-controller.js';
 
 const uiController = new UiController();
 

@@ -7,16 +7,26 @@ export class ProjectController {
     this.projects = [];
     this.storageController = new StorageController();
   }
-  doLoadProjects() {
-    this.projects = this.storageController.doDeserialize();
+  load() {
+    this.projects = this.storageController.deserialize();
     return this.projects;
   }
-  doCreateProject(projectTitle) {
-    if(this.doProjectExists(projectTitle)) return;
+  create(projectTitle) {
+    if(this.exist(projectTitle)) return;
     this.projects.push(new Project(projectTitle, ''));
-    this.storageController.doSerialize(this.projects);
+    this.storageController.serialize(this.projects);
   }
-  doProjectExists(projectTitle) {
+  remove(projectTitle) {
+    /* Save the number of projects */
+    const nProjects = this.projects.length;
+    /* Filter projects */
+    this.projects = _.filter(this.projects, (p => !(projectTitle.toLowerCase() === p.getTitle.toLowerCase())));
+    /* Check for serialization */
+    if(this.projects.length !== nProjects) {
+      this.storageController.serialize(this.projects);
+    }
+  }
+  exist(projectTitle) {
     if(0 == this.projects.length) return false;
     else return _.some(this.projects, p => projectTitle.toLowerCase() === p.getTitle.toLowerCase());
   }

@@ -114,3 +114,10 @@ a {
 header {
   display: flex;
 }
+
+/* Project */
+.project {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}

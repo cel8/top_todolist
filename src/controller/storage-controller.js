@@ -4,7 +4,7 @@ export class StorageController {
   constructor() {
     this.localStorageName = 'localTodoList';
   }
-  doDeserialize() {
+  deserialize() {
     let projects = [];
     const jsonProjects = JSON.parse(localStorage.getItem(this.localStorageName));
     if(jsonProjects) {
@@ -12,7 +12,7 @@ export class StorageController {
     }
     return projects;
   }
-  doSerialize(projects) {
+  serialize(projects) {
     localStorage.setItem(this.localStorageName, JSON.stringify(projects));
   }
 }

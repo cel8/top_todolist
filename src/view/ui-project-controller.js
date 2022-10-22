@@ -4,6 +4,7 @@ import * as btnManager from 'Utilities/button.js';
 import 'Assets/images/svg/plus-circle-outline.svg';
 import 'Assets/images/svg/project.svg';
 import 'Assets/images/svg/pencil-circle.svg';
+import 'Assets/images/svg/delete-circle.svg';
 import { ProjectController } from 'Controller/project-controller.js';
 
 export class UiProjectController {
@@ -14,13 +15,16 @@ export class UiProjectController {
     const nodeProject = domManager.createNodeClass('div', 'project');
     domManager.createAddNode('p', nodeProject, null, null, project.title);
     domManager.addNodeChild(nodeProject, btnManager.createImageButton('pencil-circle.svg', 'project-button'));
+    domManager.addNodeChild(nodeProject, btnManager.createImageButton('delete-circle.svg', 'project-button', () => {
+      this.projectController.remove(project.title); // TODO: need to remove also the div
+    }));
     domManager.addNodeChild(parentContainer, nodeProject);
   }
   doCreateProjectBar() {
     /* Load projects from project controller */
-    const projects = this.projectController.doLoadProjects();
+    const projects = this.projectController.load();
     /* Create inbox project does not exists */
-    this.projectController.doCreateProject('Inbox');
+    this.projectController.create('Inbox');
     /* Create project bar */
     const navProjectBar = domManager.createNode('div', 'nav-projects');
     const formAddProject = domManager.createNode('form', 'add-project-form');
@@ -59,7 +63,7 @@ export class UiProjectController {
       btnSubmit.setAttribute('type', 'submit');
       formAddProject.onsubmit = (e) => {
         e.preventDefault();
-        this.projectController.doCreateProject(inputProject.value);
+        this.projectController.create(inputProject.value);
         domManager.removeAllChildNodes(formAddProject);
         domManager.toggleDisplayByNode(formAddProject);
         domManager.toggleDisplayByNode(btnAddProject);

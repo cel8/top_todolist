@@ -15,6 +15,23 @@ export function createButton(btnText = '', svgIconFileName = null, className = n
   return btn;  
 }
 
+export function editButtonText(btn, text = '') {
+  const btnText = btn.querySelector('p');
+  if(btnText) {
+    /* Remove or edit text */
+    if(text === '') {
+      btnText.remove();
+    } else {
+      btnText.textContent = text;
+    }
+  } else {
+    /* Create node */
+    if(btnText.length > 0) {
+      domManager.createAddNode('p', btn, null, null, btnText);
+    }
+  }
+}
+
 export function createImageButton(svgIconFileName, className = null, cbEvent = undefined) {
   return createButton('', svgIconFileName, className, cbEvent)
 }

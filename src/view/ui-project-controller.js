@@ -18,7 +18,8 @@ export class UiProjectController {
   }
   doAddProjectUI(parentContainer, projectTitle) {
     const nodeProject = domManager.createNodeClass('div', 'project');
-    domManager.addNodeChild(nodeProject, domManager.createNodeContent('p', projectTitle));
+    const btnProject = btnManager.createButton(projectTitle, 'project.svg', 'project-button', () => {});
+    domManager.addNodeChild(nodeProject, btnProject);
     domManager.addNodeChild(nodeProject, btnManager.createImageButton('pencil-circle.svg', 'project-button', () => {
       /* Lock editing */
       if(this.#isEdit === true) return;
@@ -59,8 +60,7 @@ export class UiProjectController {
         if(this.projectController.edit(project.title, editTextPrjTitle.input.value, editTextPrjDescr.input.value)) {
           /* Update project title */
           projectTitle = editTextPrjTitle.input.value;
-          const nodeTitle = nodeProject.querySelector('p');
-          nodeTitle.textContent = projectTitle;
+          btnManager.editButtonText(btnProject, projectTitle);
         }
         domManager.removeAllChildNodes(formAddProject);
         domManager.toggleDisplayByNode(formAddProject);

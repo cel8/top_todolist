@@ -11,9 +11,9 @@ export class ProjectController {
     this.projects = this.storageController.deserialize();
     return this.projects;
   }
-  create(title) {
+  create(title, description = '') {
     if(this.exist(title)) return false;
-    this.projects.push(new Project(title, ''));
+    this.projects.push(new Project(title, description));
     this.storageController.serialize(this.projects);
     return true;
   }
@@ -34,7 +34,7 @@ export class ProjectController {
   edit(oldTitle, newTitle, description = null) {
     const index = this.#getIndex(oldTitle);
     if(-1 === index) return false;
-    if(this.exist(newTitle)) return false;
+    if((oldTitle !== newTitle) && (this.exist(newTitle))) return false;
     this.projects[index].setTitle = newTitle;
     if(description) this.projects[index].setDescription = description;
     this.storageController.serialize(this.projects);

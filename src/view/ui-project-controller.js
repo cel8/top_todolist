@@ -1,6 +1,7 @@
 import 'Style/style.css';
 import * as domManager from 'Utilities/dom-manager.js';
 import * as btnManager from 'Utilities/button.js';
+import * as inputManager from 'Utilities/input-manager.js';
 import 'Assets/images/svg/plus-circle-outline.svg';
 import 'Assets/images/svg/project.svg';
 import 'Assets/images/svg/pencil-circle.svg';
@@ -8,13 +9,21 @@ import 'Assets/images/svg/delete-circle.svg';
 import { ProjectController } from 'Controller/project-controller.js';
 
 export class UiProjectController {
+  #isEdit = false; /* Private edit field */
   constructor() {
     this.projectController = new ProjectController();
+  }
+  #toggleEditing() {
+    this.#isEdit = this.#isEdit ? false : true;
   }
   doAddProjectUI(parentContainer, projectTitle) {
     const nodeProject = domManager.createNodeClass('div', 'project');
     domManager.addNodeChild(nodeProject, domManager.createNodeContent('p', projectTitle));
     domManager.addNodeChild(nodeProject, btnManager.createImageButton('pencil-circle.svg', 'project-button', () => {
+      /* Lock editing */
+      if(this.#isEdit === true) return;
+      this.#toggleEditing();
+      /* Get items */
       const btnAddProject  = document.querySelector('.add-project-btn');
       const formAddProject = document.querySelector('.add-project-form');
       /* Toggle visibility */
@@ -23,36 +32,42 @@ export class UiProjectController {
       /* Find project */
       const project = this.projectController.find(projectTitle);
       /* Add input */
-      const nameTitleProject = 'projectTitle'
-      const labelProject = domManager.createAddNode('label', formAddProject, null, null, 'Project title:');
-      labelProject.htmlFor = nameTitleProject;
-      const inputProject = domManager.createAddNode('input', formAddProject, null, nameTitleProject);
-      inputProject.setAttribute('type', 'text');
-      inputProject.setAttribute('name', nameTitleProject);
-      inputProject.setAttribute('placeholder', 'Project name');
-      inputProject.required = true;
-      inputProject.value = project.title;
+      const editTextPrjTitle = inputManager.createEditText('prjTitle', 'Project title:', 'Project name');
+      const editTextPrjDescr = inputManager.createEditText('prjDescription', 'Project description:', 'Project description');
+      domManager.addNodeChild(formAddProject, editTextPrjTitle.label);
+      domManager.addNodeChild(formAddProject, editTextPrjTitle.input);
+      domManager.addNodeChild(formAddProject, editTextPrjDescr.label);
+      domManager.addNodeChild(formAddProject, editTextPrjDescr.input);    
+      /* Set input values */
+      editTextPrjTitle.input.value = project.title;
+      editTextPrjDescr.input.value = project.description;
+      /* Cancel button */
       const btnCancel = domManager.createAddNode('button', formAddProject, 'btnForm', null, 'Cancel');
       btnCancel.setAttribute('type', 'button');
       btnCancel.onclick = () => {
         domManager.removeAllChildNodes(formAddProject);
         domManager.toggleDisplayByNode(formAddProject);
         domManager.toggleDisplayByNode(btnAddProject);
+        /* Unlock editing */
+        this.#toggleEditing();
       }
+      /* Submit button */
       const btnSubmit = domManager.createAddNode('button', formAddProject, 'btnForm', null, 'Submit');
       btnSubmit.setAttribute('type', 'submit');
       formAddProject.onsubmit = (e) => {
         e.preventDefault();
-        if(this.projectController.edit(project.title, inputProject.value)) {
+        if(this.projectController.edit(project.title, editTextPrjTitle.input.value, editTextPrjDescr.input.value)) {
           /* Update project title */
-          projectTitle = inputProject.value;
+          projectTitle = editTextPrjTitle.input.value;
           const nodeTitle = nodeProject.querySelector('p');
           nodeTitle.textContent = projectTitle;
         }
         domManager.removeAllChildNodes(formAddProject);
         domManager.toggleDisplayByNode(formAddProject);
         domManager.toggleDisplayByNode(btnAddProject);
-      }      
+        /* Unlock editing */
+        this.#toggleEditing();
+      }
     }));
     domManager.addNodeChild(nodeProject, btnManager.createImageButton('delete-circle.svg', 'project-button', () => {
       this.projectController.remove(projectTitle);
@@ -80,35 +95,42 @@ export class UiProjectController {
     });
     /* Add project button */
     const btnAddProject = btnManager.createButton('Add project', 'plus-circle-outline.svg', 'project-button', async () => {
+      /* Lock editing */
+      if(this.#isEdit === true) return;
+      this.#toggleEditing();
       /* Toggle visibility */
       domManager.toggleDisplayByNode(btnAddProject);
       domManager.toggleDisplayByNode(formAddProject);
-      // Add input
-      const nameTitleProject = 'projectTitle'
-      const labelProject = domManager.createAddNode('label', formAddProject, null, null, 'Project title:');
-      labelProject.htmlFor = nameTitleProject;
-      const inputProject = domManager.createAddNode('input', formAddProject, null, nameTitleProject);
-      inputProject.setAttribute('type', 'text');
-      inputProject.setAttribute('name', nameTitleProject);
-      inputProject.setAttribute('placeholder', 'Project name');
-      inputProject.required = true;
+      /* Add input */
+      const editTextPrjTitle = inputManager.createEditText('prjTitle', 'Project title:', 'Project name');
+      const editTextPrjDescr = inputManager.createEditText('prjDescription', 'Project description:', 'Project description');
+      domManager.addNodeChild(formAddProject, editTextPrjTitle.label);
+      domManager.addNodeChild(formAddProject, editTextPrjTitle.input);
+      domManager.addNodeChild(formAddProject, editTextPrjDescr.label);
+      domManager.addNodeChild(formAddProject, editTextPrjDescr.input);
+      /* Cancel button */
       const btnCancel = domManager.createAddNode('button', formAddProject, 'btnForm', null, 'Cancel');
       btnCancel.setAttribute('type', 'button');
       btnCancel.onclick = () => {
         domManager.removeAllChildNodes(formAddProject);
         domManager.toggleDisplayByNode(formAddProject);
         domManager.toggleDisplayByNode(btnAddProject);
+        /* Unlock editing */
+        this.#toggleEditing();
       }
+      /* Submit button */
       const btnSubmit = domManager.createAddNode('button', formAddProject, 'btnForm', null, 'Submit');
       btnSubmit.setAttribute('type', 'submit');
       formAddProject.onsubmit = (e) => {
         e.preventDefault();
-        if(this.projectController.create(inputProject.value)) {
-          this.doAddProjectUI(nodeProjects, inputProject.value);
+        if(this.projectController.create(editTextPrjTitle.input.value, editTextPrjDescr.input.value)) {
+          this.doAddProjectUI(nodeProjects, editTextPrjTitle.input.value);
         }
         domManager.removeAllChildNodes(formAddProject);
         domManager.toggleDisplayByNode(formAddProject);
         domManager.toggleDisplayByNode(btnAddProject);
+        /* Unlock editing */
+        this.#toggleEditing();
       }
     });
     btnAddProject.classList.add('add-project-btn');

@@ -14,7 +14,46 @@ export class UiProjectController {
   doAddProjectUI(parentContainer, projectTitle) {
     const nodeProject = domManager.createNodeClass('div', 'project');
     domManager.addNodeChild(nodeProject, domManager.createNodeContent('p', projectTitle));
-    domManager.addNodeChild(nodeProject, btnManager.createImageButton('pencil-circle.svg', 'project-button'));
+    domManager.addNodeChild(nodeProject, btnManager.createImageButton('pencil-circle.svg', 'project-button', () => {
+      const btnAddProject  = document.querySelector('.add-project-btn');
+      const formAddProject = document.querySelector('.add-project-form');
+      /* Toggle visibility */
+      domManager.toggleDisplayByNode(btnAddProject);
+      domManager.toggleDisplayByNode(formAddProject);
+      /* Find project */
+      const project = this.projectController.find(projectTitle);
+      /* Add input */
+      const nameTitleProject = 'projectTitle'
+      const labelProject = domManager.createAddNode('label', formAddProject, null, null, 'Project title:');
+      labelProject.htmlFor = nameTitleProject;
+      const inputProject = domManager.createAddNode('input', formAddProject, null, nameTitleProject);
+      inputProject.setAttribute('type', 'text');
+      inputProject.setAttribute('name', nameTitleProject);
+      inputProject.setAttribute('placeholder', 'Project name');
+      inputProject.required = true;
+      inputProject.value = project.title;
+      const btnCancel = domManager.createAddNode('button', formAddProject, 'btnForm', null, 'Cancel');
+      btnCancel.setAttribute('type', 'button');
+      btnCancel.onclick = () => {
+        domManager.removeAllChildNodes(formAddProject);
+        domManager.toggleDisplayByNode(formAddProject);
+        domManager.toggleDisplayByNode(btnAddProject);
+      }
+      const btnSubmit = domManager.createAddNode('button', formAddProject, 'btnForm', null, 'Submit');
+      btnSubmit.setAttribute('type', 'submit');
+      formAddProject.onsubmit = (e) => {
+        e.preventDefault();
+        if(this.projectController.edit(project.title, inputProject.value)) {
+          /* Update project title */
+          projectTitle = inputProject.value;
+          const nodeTitle = nodeProject.querySelector('p');
+          nodeTitle.textContent = projectTitle;
+        }
+        domManager.removeAllChildNodes(formAddProject);
+        domManager.toggleDisplayByNode(formAddProject);
+        domManager.toggleDisplayByNode(btnAddProject);
+      }      
+    }));
     domManager.addNodeChild(nodeProject, btnManager.createImageButton('delete-circle.svg', 'project-button', () => {
       this.projectController.remove(projectTitle);
       nodeProject.remove();
@@ -71,7 +110,8 @@ export class UiProjectController {
         domManager.toggleDisplayByNode(formAddProject);
         domManager.toggleDisplayByNode(btnAddProject);
       }
-    })
+    });
+    btnAddProject.classList.add('add-project-btn');
     /* Load project to navigation path */
     domManager.addNodeChild(navProjectBar, domManager.createNodeContent('p', 'Projects'));
     domManager.addNodeChild(navProjectBar, btnAddProject);

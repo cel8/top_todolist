@@ -11,26 +11,40 @@ export class ProjectController {
     this.projects = this.storageController.deserialize();
     return this.projects;
   }
-  create(projectTitle) {
-    if(this.exist(projectTitle)) return false;
-    this.projects.push(new Project(projectTitle, ''));
+  create(title) {
+    if(this.exist(title)) return false;
+    this.projects.push(new Project(title, ''));
     this.storageController.serialize(this.projects);
     return true;
   }
-  remove(projectTitle) {
+  remove(title) {
     /* Save the number of projects */
     const nProjects = this.projects.length;
     /* Filter projects */
-    this.projects = _.filter(this.projects, (p => !(projectTitle.toLowerCase() === p.getTitle.toLowerCase())));
+    this.projects = _.filter(this.projects, (p => !(title.toLowerCase() === p.getTitle.toLowerCase())));
     /* Check for serialization */
-    if(this.projects.length !== nProjects) {
-      this.storageController.serialize(this.projects);
-      return true;
-    }
-    return false;
+    if(this.projects.length === nProjects) return false;
+    this.storageController.serialize(this.projects);
+    return true;
   }
-  exist(projectTitle) {
+  find(title) {
+    const index = this.#getIndex(title);
+    return -1 !== index ? this.projects[index] : null;
+  }
+  edit(oldTitle, newTitle, description = null) {
+    const index = this.#getIndex(oldTitle);
+    if(-1 === index) return false;
+    if(this.exist(newTitle)) return false;
+    this.projects[index].setTitle = newTitle;
+    if(description) this.projects[index].setDescription = description;
+    this.storageController.serialize(this.projects);
+    return true;
+  }
+  exist(title) {
     if(0 == this.projects.length) return false;
-    else return _.some(this.projects, p => projectTitle.toLowerCase() === p.getTitle.toLowerCase());
+    else return _.some(this.projects, p => title.toLowerCase() === p.getTitle.toLowerCase());
+  }
+  #getIndex(title) {
+    return _.findIndex(this.projects, p => title.toLowerCase() === p.getTitle.toLowerCase());
   }
 }

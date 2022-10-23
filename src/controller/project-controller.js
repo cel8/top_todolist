@@ -12,9 +12,10 @@ export class ProjectController {
     return this.projects;
   }
   create(projectTitle) {
-    if(this.exist(projectTitle)) return;
+    if(this.exist(projectTitle)) return false;
     this.projects.push(new Project(projectTitle, ''));
     this.storageController.serialize(this.projects);
+    return true;
   }
   remove(projectTitle) {
     /* Save the number of projects */
@@ -24,7 +25,9 @@ export class ProjectController {
     /* Check for serialization */
     if(this.projects.length !== nProjects) {
       this.storageController.serialize(this.projects);
+      return true;
     }
+    return false;
   }
   exist(projectTitle) {
     if(0 == this.projects.length) return false;

@@ -11,12 +11,13 @@ export class UiProjectController {
   constructor() {
     this.projectController = new ProjectController();
   }
-  doAddProjectUI(parentContainer, project) {
+  doAddProjectUI(parentContainer, projectTitle) {
     const nodeProject = domManager.createNodeClass('div', 'project');
-    domManager.createAddNode('p', nodeProject, null, null, project.title);
+    domManager.addNodeChild(nodeProject, domManager.createNodeContent('p', projectTitle));
     domManager.addNodeChild(nodeProject, btnManager.createImageButton('pencil-circle.svg', 'project-button'));
     domManager.addNodeChild(nodeProject, btnManager.createImageButton('delete-circle.svg', 'project-button', () => {
-      this.projectController.remove(project.title); // TODO: need to remove also the div
+      this.projectController.remove(projectTitle);
+      nodeProject.remove();
     }));
     domManager.addNodeChild(parentContainer, nodeProject);
   }
@@ -35,7 +36,7 @@ export class UiProjectController {
     projects.forEach((project) => {
       /* Esclude inbox because it has a different management */
       if(project.title.toLowerCase() !== 'inbox') {
-        this.doAddProjectUI(nodeProjects, project);
+        this.doAddProjectUI(nodeProjects, project.title);
       }
     });
     /* Add project button */
@@ -63,7 +64,9 @@ export class UiProjectController {
       btnSubmit.setAttribute('type', 'submit');
       formAddProject.onsubmit = (e) => {
         e.preventDefault();
-        this.projectController.create(inputProject.value);
+        if(this.projectController.create(inputProject.value)) {
+          this.doAddProjectUI(nodeProjects, inputProject.value);
+        }
         domManager.removeAllChildNodes(formAddProject);
         domManager.toggleDisplayByNode(formAddProject);
         domManager.toggleDisplayByNode(btnAddProject);

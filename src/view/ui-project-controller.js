@@ -7,18 +7,23 @@ import 'Assets/images/svg/project.svg';
 import 'Assets/images/svg/pencil-circle.svg';
 import 'Assets/images/svg/delete-circle.svg';
 import { ProjectController } from 'Controller/project-controller.js';
+import { UiTaskController } from 'View/ui-task-controller.js';
 
 export class UiProjectController {
   #isEdit = false; /* Private edit field */
   constructor() {
-    this.projectController = new ProjectController();
+    this.projectController = ProjectController.getInstance();
+    this.uiTaskController = new UiTaskController();
   }
   #toggleEditing() {
     this.#isEdit = this.#isEdit ? false : true;
   }
   doAddProjectUI(parentContainer, projectTitle) {
     const nodeProject = domManager.createNodeClass('div', 'project');
-    const btnProject = btnManager.createButton(projectTitle, 'project.svg', 'project-button', () => {});
+    const btnProject = btnManager.createButton(projectTitle, 'project.svg', 'project-button', () => {
+      // TODO: stop editing #isEdit
+      this.uiTaskController.doLoadProjectTask(projectTitle);
+    });
     domManager.addNodeChild(nodeProject, btnProject);
     domManager.addNodeChild(nodeProject, btnManager.createImageButton('pencil-circle.svg', 'project-button', () => {
       /* Lock editing */
@@ -70,8 +75,14 @@ export class UiProjectController {
       }
     }));
     domManager.addNodeChild(nodeProject, btnManager.createImageButton('delete-circle.svg', 'project-button', () => {
+      /* Lock editing */
+      if(this.#isEdit === true) return;
+      this.#toggleEditing();
+      /* Remove project */
       this.projectController.remove(projectTitle);
       nodeProject.remove();
+      /* Unlock editing */
+      this.#toggleEditing();
     }));
     domManager.addNodeChild(parentContainer, nodeProject);
   }

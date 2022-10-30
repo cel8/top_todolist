@@ -7,6 +7,12 @@ export class ProjectController {
     this.projects = [];
     this.storageController = new StorageController();
   }
+  static getInstance() {
+    if(!this.instance) {
+      this.instance = new ProjectController();
+    }
+    return this.instance;
+  }
   load() {
     this.projects = this.storageController.deserialize();
     return this.projects;

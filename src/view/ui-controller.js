@@ -20,11 +20,11 @@ export class UiController {
     this.uiProjectController = new UiProjectController();
   }
   #doLoadHeader() {
-    const header  = domManager.createNode('header');
+    const header  = document.querySelector('header');
     const imgMenu = domManager.createAddNodeImg('menu.svg', 'menu', header, 'icon');
     const imgHome = domManager.createAddNodeImg('home-outline.svg', 'home', header, 'icon');
     domManager.createAddNodeImg('todo-list.gif', 'todo-list', header, 'icon');
-    domManager.createAddNode('p', header, 'main-text', null, 'TODO list');
+    domManager.createAddNode('p', header, 'main-text', null, 'Task list');
     domManager.createAddNodeImg('calendar-blank.svg', 'today', header, 'icon');
     domManager.addNodeChild(body, header);
     imgMenu.onclick = async () => {
@@ -33,16 +33,13 @@ export class UiController {
     }
   }
   #doLoadMainContent() {
-    const nav = domManager.createNode('nav');
-    const main = domManager.createNode('main');
-    nav.textContent = 'nav';
-    main.textContent = 'main';
+    const main = document.querySelector('main');
     this.#doCreateNavBar();
     domManager.addNodeChild(body, main);
   }
   #doCreateNavBar() {
     /* Create navigation bar */
-    const nav = domManager.createNode('nav');
+    const nav = document.querySelector('nav');
     const nodeProjects = this.uiProjectController.doCreateProjectBar();
     domManager.addNodeChild(nav, btnManager.createButton('Inbox', 'inbox.svg', 'project-button'));
     domManager.addNodeChild(nav, btnManager.createButton('Today', 'calendar-today.svg', 'project-button'));
@@ -53,13 +50,21 @@ export class UiController {
   }
   #doLoadFooter() {
     const curYear = new Date().getFullYear();
-    const footer = domManager.createNode('footer')
+    const footer = document.querySelector('footer')
     domManager.createAddNode('p', footer, null, null, `Copyright © ${curYear} Alessandro Celotti`);
     domManager.addNodeChild(footer, btnManager.createImageLinkButton('https://github.com/cel8', 'github.svg'));
     domManager.addNodeChild(body, footer);
   }
+  #doLoadOverlay() {
+    const overlay = document.querySelector('#overlay');
+    const divOverlay = domManager.createAddNode('div', overlay);
+    domManager.createAddNode('form', divOverlay, 'form-manage-task');
+    // Hide overlay
+    domManager.toggleDisplayByNode(overlay);
+  }
   doLoadUI() {
     this.#doLoadHeader();
+    this.#doLoadOverlay();
     this.#doLoadMainContent();
     this.#doLoadFooter();
   }

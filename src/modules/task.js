@@ -1,21 +1,21 @@
-export const todoType = {
+export const taskType = {
   note: 'note',
-  list: 'list'
+  list: 'checklist'
 };
 
-export const todoPriority = {
+export const taskPriority = {
   critical: 'critical',
   high: 'high',
   normal: 'normal',
   low: 'low'
 }
 
-class Todo {
+class Task {
   constructor(title, description) {
     this.title = title;
     this.description = description || '';
     this.dueDate = null;
-    this.priority = todoPriority.normal;
+    this.priority = taskPriority.normal;
   }
   /**
    * @param {any} title
@@ -30,7 +30,7 @@ class Todo {
   /**
    * @param {any} priority
    */
-  set setPriority(priority) { this.priority = priority ? priority : todoPriority.normal; }
+  set setPriority(priority) { this.priority = priority ? priority : taskPriority.normal; }
   get getPriority() { return this.priority; }
   /**
    * @param {any} dueDate
@@ -39,7 +39,7 @@ class Todo {
   get getDueDate() { return this.dueDate; }
 }
 
-export class TodoNote extends Todo {
+export class TaskNote extends Task {
   constructor(title, description) {
     super(title, description);
     this.note = '';
@@ -51,7 +51,7 @@ export class TodoNote extends Todo {
   get getNote() { return this.note; }
 }
 
-export class TodoCheckList extends Todo {
+export class TaskCheckList extends Task {
   constructor(title, description) {
     super(title, description);
     this.setCheckList = new Set();
@@ -65,20 +65,20 @@ export class TodoCheckList extends Todo {
   }
 }
 
-export class TodoFactory {
+export class TaskFactory {
   constructor() {
-    this.todoClass = TodoNote;
+    this.taskClass = TaskNote;
   }
-  createTodo(type, title, description = '') {
+  createTask(type, title, description = '') {
     switch(type) {
-      case todoType.list:
-        this.todoClass = TodoCheckList;
+      case taskType.list:
+        this.taskClass = TaskCheckList;
         break;
-      case todoType.note:
+      case taskType.note:
       default:
-        this.todoClass = TodoNote;
+        this.taskClass = TaskNote;
         break;
     }
-    return new this.todoClass(title, description);
+    return new this.taskClass(title, description);
   }
 }

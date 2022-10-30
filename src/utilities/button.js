@@ -36,6 +36,10 @@ export function createImageButton(svgIconFileName, className = null, cbEvent = u
   return createButton('', svgIconFileName, className, cbEvent)
 }
 
+export function createTextButton(btnText, className = null, cbEvent = undefined) {
+  return createButton(btnText, null, className, cbEvent)
+}
+
 export function createImageLinkButton(link, svgIconFileName) {
   const node = domManager.createNodeLink(link, null, null, null, 
     domManager.createNodeImg(svgIconFileName, 'imageLink', 'icon-link')

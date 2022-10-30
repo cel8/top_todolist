@@ -9,11 +9,13 @@ module.exports = {
     storageController:  './src/controller/storage-controller.js',
     index:              './src/index.js',
     project:            './src/modules/project.js',
-    todo:               './src/modules/todo.js',
+    task:               './src/modules/task.js',
     button:             './src/utilities/button.js',
+    inputManager:       './src/utilities/input-manager.js',
     domManager:         './src/utilities/dom-manager.js',
     uiController:       './src/view/ui-controller.js',
-    uiProjectCtrl:      './src/view/ui-project-controller.js'
+    uiProjectCtrl:      './src/view/ui-project-controller.js',
+    uiTaskCtrl:         './src/view/ui-task-controller.js'
   },
   devtool: 'inline-source-map',
   plugins: [

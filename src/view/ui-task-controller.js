@@ -1,4 +1,5 @@
 import { ProjectController } from 'Controller/project-controller.js';
+import { TaskController } from 'Controller/task-controller.js';
 import * as domManager from 'Utilities/dom-manager.js';
 import * as btnManager from 'Utilities/button.js';
 import * as inputManager from 'Utilities/input-manager.js';
@@ -12,6 +13,14 @@ const main = document.querySelector('main');
 export class UiTaskController {
   constructor() {
     this.projectController = ProjectController.getInstance();
+    this.taskController = TaskController.getInstance();
+  }
+  doAddTaskUI(parentContainer, task) {
+    const pTaskTitle = domManager.createNodeContent('p', task.getTitle);
+    const pTaskDueDate = domManager.createNodeContent('p', task.dueDate);
+    // Add node to container
+    domManager.addNodeChild(parentContainer, pTaskTitle);
+    domManager.addNodeChild(parentContainer, pTaskDueDate);
   }
   doLoadProjectTask(projectTitle) {
     // Remove main content
@@ -20,6 +29,9 @@ export class UiTaskController {
     const project = this.projectController.find(projectTitle);
     // Load project title and description
     const divProject = domManager.createAddNode('div', main, 'task-project');
+    const divTaskContainer = domManager.createNode('div', 'task-container');
+    const tasks = this.taskController.fetch(projectTitle);
+    tasks.forEach(t => this.doAddTaskUI(divTaskContainer, t))
     domManager.addNodeChild(divProject, domManager.createNodeContent('p', projectTitle));
     domManager.addNodeChild(divProject, domManager.createNodeContent('p', project.getDescription));
     /* Add project button */
@@ -34,6 +46,17 @@ export class UiTaskController {
       // Submit event
       const cbEventSubmit = (e) => {
         e.preventDefault();
+        const task = this.taskController.createTask({
+          title: editTextTaskTitle.input.value,
+          description: editTextTaskDescr.input.value,
+          dueDate: dueDateTask.input.value,
+          priority: radioBtnPriority.find(item => item.radio.checked === true).radio.value,
+          note: editTextTaskNote.input.value,
+          list: []
+        });
+        if(this.taskController.add(projectTitle, task)) {
+          this.doAddTaskUI(divTaskContainer, task);
+        }
         // TODO: add task in list
         domManager.toggleDisplayByNode(overlay);
       };
@@ -48,7 +71,7 @@ export class UiTaskController {
       // Checklist event
       const cbEventChangeTaskType = () => {
         // Detects for content
-        if(('' !== editTextTaskDescr.input.value) ||
+        if(('' !== editTextTaskNote.input.value) ||
            (0 !== checkListTasks.length &&
             _.some(checkListTasks, item => '' !== item.querySelector('input').value))) {
           // Notify to user that everything will be discarded
@@ -60,7 +83,7 @@ export class UiTaskController {
         domManager.removeAllChildNodes(divOptional);
         // Restore content
         checkListTasks.splice(0, checkListTasks.length);
-        editTextTaskDescr.input.value = '';
+        editTextTaskNote.input.value = '';
         if(switchTaskType.checkbox.checked) {
           // Insert add new item in checklist
           domManager.addNodeChild(divOptional, inputManager.createButton('addTaskItem', 'Add item in checklist', 'plus-circle-outline.svg', 'task-button', () => {
@@ -83,7 +106,7 @@ export class UiTaskController {
           }).input);
         } else {
           // Add edit box
-          domManager.addNodeChild(divOptional, editTextTaskDescr.input);
+          domManager.addNodeChild(divOptional, editTextTaskNote.input);
         }
       };
       // Create input
@@ -91,6 +114,7 @@ export class UiTaskController {
       const btnClose          = inputManager.createImageButton('btnCancel', 'close-circle.svg', 'task-button', cbEventCancel);
       const divInput          = domManager.createNode('div', 'task-form-container');
       const editTextTaskTitle = inputManager.createEditText('taskTitle', 'Task Title');
+      const editTextTaskDescr = inputManager.createEditText('taskDescription', 'Task Description', null, false);
       const dueDateTask       = inputManager.createDate('taskDueDate', 'Due Date');
       const divPriority       = domManager.createNode('div', 'task-priority');
       const pTaskPriority     = domManager.createNodeContent('p', 'Task Priority');
@@ -102,7 +126,7 @@ export class UiTaskController {
       }
       const switchTaskType    = inputManager.createSwitchButton('switchTaskType', true, 'Change task type', cbEventChangeTaskType);
       const divOptional       = domManager.createNode('div', 'optional-content');
-      const editTextTaskDescr = inputManager.createEditText('taskDescription', 'Task Description', null, false);
+      const editTextTaskNote  = inputManager.createEditText('taskNote', 'Task notes', null, false);
       const checkListTasks    = [];
       const btnCancel         = inputManager.createTextButton('btnCancel', 'Cancel', 'task-button', cbEventCancel);
       const btnSubmit         = inputManager.createTextButton('btnSubmit', 'Submit', 'task-button', cbEventSubmit, formMngTask);
@@ -110,6 +134,7 @@ export class UiTaskController {
       domManager.addNodeChild(formMngTask, pTaskTitle);
       domManager.addNodeChild(formMngTask, btnClose.input);
       domManager.addNodeChild(divInput, editTextTaskTitle.input);
+      domManager.addNodeChild(divInput, editTextTaskDescr.input);
       domManager.addNodeChild(divInput, dueDateTask.label);
       domManager.addNodeChild(divInput, dueDateTask.input);
       domManager.addNodeChild(divInput, divPriority);
@@ -119,13 +144,14 @@ export class UiTaskController {
       domManager.addNodeChild(divInput, switchTaskType.input);
       domManager.addNodeChild(divInput, divOptional);
       domManager.addNodeChild(formMngTask, divInput);
-      domManager.addNodeChild(divOptional, editTextTaskDescr.input);
+      domManager.addNodeChild(divOptional, editTextTaskNote.input);
       domManager.addNodeChild(formMngTask, btnCancel.input);
       domManager.addNodeChild(formMngTask, btnSubmit.input);
       // Toggle overlay
       domManager.toggleDisplayByNode(overlay);
     });
     btnAddTask.classList.add('add-task-btn');
-    domManager.addNodeChild(divProject, btnAddTask);
+    domManager.addNodeChild(main, btnAddTask);
+    domManager.addNodeChild(main, divTaskContainer);
   }
 }

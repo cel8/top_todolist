@@ -7,6 +7,7 @@ module.exports = {
   entry: {
     projectController:  './src/controller/project-controller.js',
     storageController:  './src/controller/storage-controller.js',
+    taskController:     './src/controller/task-controller.js',
     index:              './src/index.js',
     project:            './src/modules/project.js',
     task:               './src/modules/task.js',

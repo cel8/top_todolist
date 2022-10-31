@@ -11,11 +11,12 @@ export const taskPriority = {
 }
 
 class Task {
-  constructor(title, description) {
+  constructor(title, description, dueDate, priority) {
     this.title = title;
     this.description = description || '';
-    this.dueDate = null;
-    this.priority = taskPriority.normal;
+    this.dueDate = dueDate || new Date();
+    this.priority = taskPriority[priority] ? taskPriority[priority] : taskPriority.normal;
+    this.done = false;
   }
   /**
    * @param {any} title
@@ -37,11 +38,16 @@ class Task {
    */
   set setDueDate(dueDate) { this.dueDate = dueDate; }
   get getDueDate() { return this.dueDate; }
+  /**
+   * @param {boolean} state
+   */
+  set setDone(state) { this.done = state ? true : false; }
+  get getDone() { return this.done; }
 }
 
 export class TaskNote extends Task {
-  constructor(title, description) {
-    super(title, description);
+  constructor(title, description, dueDate, priority) {
+    super(title, description, dueDate, priority);
     this.note = '';
   }
   /**
@@ -52,8 +58,8 @@ export class TaskNote extends Task {
 }
 
 export class TaskCheckList extends Task {
-  constructor(title, description) {
-    super(title, description);
+  constructor(title, description, dueDate, priority) {
+    super(title, description, dueDate, priority);
     this.setCheckList = new Set();
   }
   get getCheckList() { return this.setCheckList; }
@@ -69,7 +75,7 @@ export class TaskFactory {
   constructor() {
     this.taskClass = TaskNote;
   }
-  createTask(type, title, description = '') {
+  createTask(type, title, description = '', dueDate = undefined, priority = undefined) {
     switch(type) {
       case taskType.list:
         this.taskClass = TaskCheckList;
@@ -79,6 +85,6 @@ export class TaskFactory {
         this.taskClass = TaskNote;
         break;
     }
-    return new this.taskClass(title, description);
+    return new this.taskClass(title, description, dueDate, priority);
   }
 }

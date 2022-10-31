@@ -90,7 +90,7 @@ export class UiProjectController {
     /* Load projects from project controller */
     const projects = this.projectController.load();
     /* Create inbox project does not exists */
-    this.projectController.create('Inbox');
+    this.projectController.add('Inbox');
     /* Create project bar */
     const navProjectBar = domManager.createNode('div', 'nav-projects');
     const formAddProject = domManager.createNode('form', 'add-project-form');
@@ -134,7 +134,7 @@ export class UiProjectController {
       btnSubmit.setAttribute('type', 'submit');
       formAddProject.onsubmit = (e) => {
         e.preventDefault();
-        if(this.projectController.create(editTextPrjTitle.input.value, editTextPrjDescr.input.value)) {
+        if(this.projectController.add(editTextPrjTitle.input.value, editTextPrjDescr.input.value)) {
           this.doAddProjectUI(nodeProjects, editTextPrjTitle.input.value);
         }
         domManager.removeAllChildNodes(formAddProject);

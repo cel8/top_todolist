@@ -1,11 +1,13 @@
 import _ from 'lodash';
 import { Project } from 'Modules/project.js';
+import { TaskController } from 'Controller/task-controller.js';
 import { StorageController } from 'Controller/storage-controller.js';
 
 export class ProjectController {
   constructor() {
     this.projects = [];
-    this.storageController = new StorageController();
+    this.storageController = new StorageController('projectTable');
+    this.taskController = TaskController.getInstance();
   }
   static getInstance() {
     if(!this.instance) {
@@ -15,15 +17,20 @@ export class ProjectController {
   }
   load() {
     this.projects = this.storageController.deserialize();
+    // FIXME: understand howto deserialize tasks 
+    this.taskController.load();
     return this.projects;
   }
-  create(title, description = '') {
+  add(title, description = '') {
     if(this.exist(title)) return false;
+    if(!this.taskController.create(title)) return false;
     this.projects.push(new Project(title, description));
     this.storageController.serialize(this.projects);
     return true;
   }
   remove(title) {
+    /* Delete related tasks */
+    if(!this.taskController.delete(title)) return false;
     /* Save the number of projects */
     const nProjects = this.projects.length;
     /* Filter projects */
@@ -41,6 +48,7 @@ export class ProjectController {
     const index = this.#getIndex(oldTitle);
     if(-1 === index) return false;
     if((oldTitle !== newTitle) && (this.exist(newTitle))) return false;
+    if(!this.taskController.migrate(oldTitle, newTitle)) return false;
     this.projects[index].setTitle = newTitle;
     if(description) this.projects[index].setDescription = description;
     this.storageController.serialize(this.projects);

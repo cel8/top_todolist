@@ -1,18 +1,86 @@
-import { Project } from "Modules/project";
+import { Project } from 'Modules/project';
+import { TaskFactory, taskType } from 'Modules/task.js';
+
+export const storageTable = {
+  projectTable: 'localTodoList',
+  taskTable: 'localTodoTaskList'
+}
 
 export class StorageController {
-  constructor() {
-    this.localStorageName = 'localTodoList';
+  constructor(table) {
+    if(!storageTable[table]) throw 'Invalid table name';
+    this.lStorageTableName = storageTable[table];
   }
   deserialize() {
-    let projects = [];
-    const jsonProjects = JSON.parse(localStorage.getItem(this.localStorageName));
-    if(jsonProjects) {
-      projects = jsonProjects.map((project) => new Project(project.title, project.description));
+    let data;
+    const jsonParseData = JSON.parse(localStorage.getItem(this.lStorageTableName), this.#reviver);
+    if(jsonParseData) {
+      if(this.lStorageTableName === storageTable.projectTable) {
+        data = jsonParseData.map((project) => new Project(project.title, project.description));
+      } else {
+        // FIXME: improve this code
+        const taskFactory = new TaskFactory();
+        data = new Map();
+        jsonParseData.forEach((value, key) => {
+          data.set(key, []);
+          value.forEach(v => {
+            const task = taskFactory.createTask(taskType.note, v.title, v.description, v.dueDate, v.priority);
+            data.get(key).push(task); 
+          });  
+        });
+      }
+    } else {
+      data = this.lStorageTableName === storageTable.projectTable ? [] : new Map();
     }
-    return projects;
+    return data;
   }
-  serialize(projects) {
-    localStorage.setItem(this.localStorageName, JSON.stringify(projects));
+  serialize(data) {
+    localStorage.setItem(this.lStorageTableName, JSON.stringify(data, this.#replacer));
+  }
+  #replacer(key, value) {
+    if (typeof value === 'object' && value !== null) {
+      if (value instanceof Map) {
+        return {
+          _meta: { type: 'map' },
+          value: Array.from(value.entries()),
+        };
+      } else if (value instanceof Set) { // bonus feature!
+        return {
+          _meta: { type: 'set' },
+          value: Array.from(value.values()),
+        };
+      } else if ('_meta' in value) {
+        // Escape '_meta' properties
+        return {
+          ...value,
+          _meta: {
+            type: 'escaped-meta',
+            value: value['_meta'],
+          },
+        };
+      }
+    }
+    return value;
+  }
+  #reviver(key, value) {
+    if (typeof value === 'object' && value !== null) {
+      if ('_meta' in value) {
+        if (value._meta.type === 'map') {
+          return new Map(value.value);
+        } else if (value._meta.type === 'set') {
+          return new Set(value.value);
+        } else if (value._meta.type === 'escaped-meta') {
+          // Un-escape the '_meta' property
+          return {
+            ...value,
+            _meta: value._meta.value,
+          };
+        } else {
+          console.warn('Unexpected meta', value._meta);
+        }
+      }
+    }
+    return value;
   }
 }
+

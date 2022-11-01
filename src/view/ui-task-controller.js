@@ -89,6 +89,7 @@ export class UiTaskController {
     // Cancel event
     const cbEventCancel = cbFinalizeForm;
     // Submit event
+    // TODO: need to implement form validation
     const cbEventSubmit = (e) => {
       e.preventDefault();
       taskFormArgs.isEdit ? cbEventEdit() : cbEventAdd();

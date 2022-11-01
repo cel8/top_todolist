@@ -57,6 +57,7 @@ export class UiProjectController {
       }
     }
     // Submit event
+    // TODO: need to implement form validation
     const cbEventSubmit = (e) => {
       e.preventDefault();
       prjFormArgs.isEdit ? cbEventEdit() : cbEventAdd();
@@ -80,6 +81,7 @@ export class UiProjectController {
     }
   }
   doAddProjectUI(parentContainer, projectTitle) {
+    // TODO: implement number of active tasks observer
     const prjFormArgs = {
       isEdit: true,
       projectTitle: projectTitle,

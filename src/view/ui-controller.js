@@ -48,7 +48,10 @@ export class UiController {
     const nodeProjects = this.uiProjectController.doCreateProjectBar();
     domManager.addNodeChild(nav, btnManager.createButton('Inbox', 'inbox.svg', 'project-button', () => {
       this.uiTaskController.doLoadProjectTask('Inbox');
+      // TODO: implement number of active tasks
     }));
+    // TODO: implement calendar load tasks
+    // TODO: implement number of active tasks
     domManager.addNodeChild(nav, btnManager.createButton('Today', 'calendar-today.svg', 'project-button'));
     domManager.addNodeChild(nav, btnManager.createButton('This week', 'calendar-week.svg', 'project-button'));
     domManager.addNodeChild(nav, btnManager.createButton('This month', 'calendar-month.svg', 'project-button'));

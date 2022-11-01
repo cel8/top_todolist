@@ -120,7 +120,7 @@ export class TaskController {
       this.fetch(projectKey)[idxOldTask].setPriority = newTask.getPriority;
       this.fetch(projectKey)[idxOldTask].setDone = oldTask.getDone;
       if(newTask.getType === mTask.taskType.note) {
-        this.fetch(projectKey)[idxOldTask].setNote = oldTask.getNote;
+        this.fetch(projectKey)[idxOldTask].setNote = newTask.getNote;
       } else {
         // TODO: manage list
       }

@@ -46,7 +46,9 @@ export class UiController {
     /* Create navigation bar */
     const nav = document.querySelector('nav');
     const nodeProjects = this.uiProjectController.doCreateProjectBar();
-    domManager.addNodeChild(nav, btnManager.createButton('Inbox', 'inbox.svg', 'project-button'));
+    domManager.addNodeChild(nav, btnManager.createButton('Inbox', 'inbox.svg', 'project-button', () => {
+      this.uiTaskController.doLoadProjectTask('Inbox');
+    }));
     domManager.addNodeChild(nav, btnManager.createButton('Today', 'calendar-today.svg', 'project-button'));
     domManager.addNodeChild(nav, btnManager.createButton('This week', 'calendar-week.svg', 'project-button'));
     domManager.addNodeChild(nav, btnManager.createButton('This month', 'calendar-month.svg', 'project-button'));
@@ -67,6 +69,7 @@ export class UiController {
     domManager.toggleDisplayByNode(overlay);
     domManager.toggleDisplayByNode(domManager.createAddNode('form', divOverlay, 'manage-form-task'));
     domManager.toggleDisplayByNode(domManager.createAddNode('div', divOverlay, 'manage-details-task'));
+    this.uiTaskController.doCreateTaskDetails();
   }
   doLoadUI() {
     this.#doLoadHeader();

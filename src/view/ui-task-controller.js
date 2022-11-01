@@ -3,7 +3,7 @@ import { TaskController } from 'Controller/task-controller.js';
 import * as domManager from 'Utilities/dom-manager.js';
 import * as btnManager from 'Utilities/button.js';
 import * as inputManager from 'Utilities/input-manager.js';
-import { taskPriority } from 'Modules/task';
+import { taskPriority, taskType } from 'Modules/task.js';
 import 'Assets/images/svg/close-circle.svg';
 import _ from 'lodash';
 
@@ -20,6 +20,7 @@ export class UiTaskController {
     const projectTask = taskFormArgs.isEdit ? this.taskController.findTask(taskFormArgs.projectTitle, taskFormArgs.taskTitle)
                                             : null;
     // Toggle visibility
+    domManager.toggleDisplayByNode(overlay);
     domManager.toggleDisplayByNode(formMngTask);
     // Remove all form content
     domManager.removeAllChildNodes(formMngTask);
@@ -197,8 +198,68 @@ export class UiTaskController {
     domManager.addNodeChild(divOptional, editTextTaskNote.input);
     domManager.addNodeChild(formMngTask, btnCancel.input);
     domManager.addNodeChild(formMngTask, btnSubmit.input);
-    // Toggle overlay
+  }
+  doCreateTaskDetails() {
+    const divMngTaskDetails = overlay.querySelector('.manage-details-task');
+    // Hide form and overlay
+    const cbFinalizeForm = () => {
+      domManager.toggleDisplayByNode(overlay);
+      domManager.toggleDisplayByNode(divMngTaskDetails);
+    };
+    // Cancel event
+    const cbEventCancel = cbFinalizeForm;
+    // Create container content
+    const pDetailsHdr      = domManager.createNodeContent('p', 'Task information');
+    const btnClose         = inputManager.createImageButton('btnCancel', 'close-circle.svg', 'task-button', cbEventCancel);
+    const divTaskDetails   = domManager.createNode('div', 'task-details-container');
+    const pTaskTitle       = { label: domManager.createNodeContent('p', 'Title:'), data: domManager.createNode('p', 'task-details-title') };
+    const pTaskDescription = { label: domManager.createNodeContent('p', 'Description:'), data: domManager.createNode('p', 'task-details-description') };
+    const pTaskDueDate     = { label: domManager.createNodeContent('p', 'Due date:'), data: domManager.createNode('p', 'task-details-duedate') };
+    const pTaskPriority    = { label: domManager.createNodeContent('p', 'Priority:'), data: domManager.createNode('p', 'task-details-priority') };
+    const pTaskProject     = { label: domManager.createNodeContent('p', 'Project:'), data: domManager.createNode('p', 'task-details-project') };
+    const divTaskOptional  = domManager.createNode('div', 'task-details-opt');
+    domManager.addNodeChild(divMngTaskDetails, pDetailsHdr);
+    domManager.addNodeChild(divMngTaskDetails, btnClose.input);
+    domManager.addNodeChild(divMngTaskDetails, divTaskDetails);
+    domManager.addNodeChild(divTaskDetails, pTaskTitle.label);
+    domManager.addNodeChild(divTaskDetails, pTaskTitle.data);
+    domManager.addNodeChild(divTaskDetails, pTaskDescription.label);
+    domManager.addNodeChild(divTaskDetails, pTaskDescription.data);
+    domManager.addNodeChild(divTaskDetails, pTaskDueDate.label);
+    domManager.addNodeChild(divTaskDetails, pTaskDueDate.data);
+    domManager.addNodeChild(divTaskDetails, pTaskPriority.label);
+    domManager.addNodeChild(divTaskDetails, pTaskPriority.data);
+    domManager.addNodeChild(divTaskDetails, pTaskProject.label);
+    domManager.addNodeChild(divTaskDetails, pTaskProject.data);
+    domManager.addNodeChild(divTaskDetails, divTaskOptional);
+    domManager.toggleDisplayByNode(divTaskOptional);
+  }
+  #doOpenTaskDetails(projectTitle, taskTitle) {
+    const divMngTaskDetails = overlay.querySelector('.manage-details-task');
+    const divTaskOptional   = divMngTaskDetails.querySelector('.task-details-opt');
+    const task              = this.taskController.findTask(projectTitle, taskTitle);
+    // Toggle visibility
     domManager.toggleDisplayByNode(overlay);
+    domManager.toggleDisplayByNode(divMngTaskDetails);
+    // Remove all optional content
+    domManager.removeAllChildNodes(divTaskOptional);
+    // Update details
+    divMngTaskDetails.querySelector('.task-details-title').textContent       = task.getTitle;
+    divMngTaskDetails.querySelector('.task-details-description').textContent = task.getDescription;
+    divMngTaskDetails.querySelector('.task-details-duedate').textContent     = task.getDueDate;
+    divMngTaskDetails.querySelector('.task-details-priority').textContent    = task.getPriority;
+    divMngTaskDetails.querySelector('.task-details-project').textContent     = projectTitle;
+    if(task.getType === taskType.note) {
+      const note = task.getNote;
+      if(note) {
+        const pTaskNote = { label: domManager.createNodeContent('p', 'Extra notes:'), data: domManager.createNode('p', 'task-details-note') };
+        domManager.addNodeChild(divTaskOptional, pTaskNote.label);
+        domManager.addNodeChild(divTaskOptional, pTaskNote.data);
+        domManager.toggleDisplayByNode(divTaskOptional);
+      }
+    } else {
+      // TODO: manage optional
+    }
   }
   doAddTaskUI(parentContainer, projectTitle, task) {
     const divTask = domManager.createNode('div', 'task-item');
@@ -220,7 +281,9 @@ export class UiTaskController {
     domManager.addNodeChild(divTask, checkBoxDone.input);
     domManager.addNodeChild(divTask, pTaskTitle);
     domManager.addNodeChild(divTask, pTaskDueDate);
-    domManager.addNodeChild(divTask, btnManager.createTextButton('details', 'task-button details', () => {}));
+    domManager.addNodeChild(divTask, btnManager.createTextButton('details', 'task-button details', () => {
+      this.#doOpenTaskDetails(taskFormArgs.projectTitle, taskFormArgs.taskTitle);
+    }));
     domManager.addNodeChild(divTask, btnManager.createImageButton('pencil-circle.svg', 'task-button', () => {
       this.#doManageTaskForm(taskFormArgs);
     }));

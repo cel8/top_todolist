@@ -77,7 +77,7 @@ export class TaskController {
   }
   #existTask(projectKey, title) {
     const tasks = this.fetch(projectKey);
-    if(0 == tasks) return false;
+    if(0 == tasks.length) return false;
     else return _.some(tasks, t => title.toLowerCase() === t.getTitle.toLowerCase());
   }
   #getIndex(projectKey, title) {
@@ -91,5 +91,41 @@ export class TaskController {
   changeTaskState(projectKey, title, state) {
     this.findTask(projectKey, title).setDone = state;
     this.storageController.serialize(this.mapTasks);
+  }
+  relocate(oldProjectKey, newProjectKey, oldTitle, newTask) {
+    // Check if new task title already exists in new project
+    const idxNewTask = this.#getIndex(newProjectKey, newTask.getTitle);
+    if(-1 !== idxNewTask) return false;
+    // Edit thew new task
+    if(!this.edit(oldProjectKey, oldTitle, newTask)) return false;
+    // Move task in the new project and remove the old one
+    this.add(newProjectKey, this.findTask(oldProjectKey, newTask.getTitle));
+    this.remove(oldProjectKey, newTask.getTitle);
+    this.storageController.serialize(this.mapTasks);
+    return true;
+  }
+  edit(projectKey, oldTitle, newTask) {
+    const idxOldTask = this.#getIndex(projectKey, oldTitle);
+    if(-1 === idxOldTask) return false;
+    const oldTask = this.fetch(projectKey)[idxOldTask];
+    if((oldTitle !== newTask.getTitle) && (this.#existTask(projectKey, newTask.getTitle))) return false;
+    // Change task type (remove old and insert it again)
+    if(oldTask.getType !== newTask.getType) {
+      this.remove(projectKey, oldTitle);
+      this.add(projectKey, newTask);
+    } else {
+      this.fetch(projectKey)[idxOldTask].setTitle = newTask.getTitle;
+      this.fetch(projectKey)[idxOldTask].setDescription = newTask.getDescription;
+      this.fetch(projectKey)[idxOldTask].setDueDate = newTask.getDueDate;
+      this.fetch(projectKey)[idxOldTask].setPriority = newTask.getPriority;
+      this.fetch(projectKey)[idxOldTask].setDone = oldTask.getDone;
+      if(newTask.getType === mTask.taskType.note) {
+        this.fetch(projectKey)[idxOldTask].setNote = oldTask.getNote;
+      } else {
+        // TODO: manage list
+      }
+    }
+    this.storageController.serialize(this.mapTasks);
+    return true;
   }
 }

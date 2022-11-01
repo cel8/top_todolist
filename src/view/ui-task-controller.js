@@ -17,6 +17,8 @@ export class UiTaskController {
   }
   #doManageTaskForm(taskFormArgs) {
     const formMngTask = overlay.querySelector('form');
+    const projectTask = taskFormArgs.isEdit ? this.taskController.findTask(taskFormArgs.projectTitle, taskFormArgs.taskTitle)
+                                            : null;
     // Toggle visibility
     domManager.toggleDisplayByNode(formMngTask);
     // Remove all form content
@@ -46,6 +48,42 @@ export class UiTaskController {
     };
     // Edit event
     const cbEventEdit = () => {
+      // TODO: add task in list
+      const task = this.taskController.createTask({
+        title: editTextTaskTitle.input.value,
+        description: editTextTaskDescr.input.value,
+        dueDate: dueDateTask.input.value,
+        priority: radioBtnPriority.find(item => item.radio.checked === true).radio.value,
+        note: editTextTaskNote.input.value,
+        list: []
+      });
+      if(taskFormArgs.projectTitle !== selectProject.input.value) { 
+        // Relocate task
+        if(this.taskController.relocate(taskFormArgs.projectTitle, 
+                                        selectProject.input.value, 
+                                        taskFormArgs.taskTitle, 
+                                        task)) {
+          /* Update data */
+          taskFormArgs.projectTitle = selectProject.input.value;
+          taskFormArgs.taskTitle = editTextTaskTitle.input.value;
+          taskFormArgs.priorityLevel = task.getPriority;
+          // Remove div from content
+          taskFormArgs.divTask.remove();
+        }
+      } else { 
+        // Edit task
+        if(this.taskController.edit(taskFormArgs.projectTitle, taskFormArgs.taskTitle, task)) {
+          /* Update data */
+          taskFormArgs.divTask.querySelector('.task-title').textContent = task.getTitle;
+          taskFormArgs.divTask.querySelector('.task-duedate').textContent = task.getDueDate;
+          taskFormArgs.divTask.classList.toggle(task.getPriority);
+          // Remove previous priority level
+          taskFormArgs.divTask.classList.toggle(taskFormArgs.priorityLevel);
+          // Update data arguments
+          taskFormArgs.taskTitle = editTextTaskTitle.input.value;
+          taskFormArgs.priorityLevel = task.getPriority;
+        }
+      }
     };
     // Cancel event
     const cbEventCancel = cbFinalizeForm;
@@ -134,6 +172,13 @@ export class UiTaskController {
     const checkListTasks    = [];
     const btnCancel         = inputManager.createTextButton('btnCancel', 'Cancel', 'task-button', cbEventCancel);
     const btnSubmit         = inputManager.createTextButton('btnSubmit', 'Submit', 'task-button', cbEventSubmit, formMngTask);
+    // Set value when editing
+    if(taskFormArgs.isEdit) {
+      editTextTaskTitle.input.value = projectTask.getTitle;
+      editTextTaskDescr.input.value = projectTask.getDescription;
+      dueDateTask.input.value = projectTask.getDueDate;
+      radioBtnPriority.forEach(item => item.radio.checked = (item.radio.value === projectTask.getPriority));
+    }
     /* Add input child */
     domManager.addNodeChild(formMngTask, pTaskTitle);
     domManager.addNodeChild(formMngTask, selectProject.input);
@@ -157,20 +202,30 @@ export class UiTaskController {
   }
   doAddTaskUI(parentContainer, projectTitle, task) {
     const divTask = domManager.createNode('div', 'task-item');
+    const taskFormArgs = {
+      isEdit: true,
+      projectTitle: projectTitle,
+      taskTitle: task.getTitle,
+      priorityLevel: task.getPriority,
+      divTask: divTask
+    };
     const checkBoxDone = inputManager.createCheckBox('checkBoxDone', null, () => {
-      this.taskController.changeTaskState(projectTitle, task.getTitle, checkBoxDone.input.checked);
+      this.taskController.changeTaskState(taskFormArgs.projectTitle, taskFormArgs.taskTitle, checkBoxDone.input.checked);
     }, task.getDone);
-    const pTaskTitle   = domManager.createNodeContent('p', task.getTitle);
-    const pTaskDueDate = domManager.createNodeContent('p', task.dueDate);
+    const pTaskTitle   = domManager.createNodeContent('p', task.getTitle, 'task-title');
+    const pTaskDueDate = domManager.createNodeContent('p', task.dueDate, 'task-duedate');
+    taskFormArgs.divTask.classList.toggle(taskFormArgs.priorityLevel);
     // Add node to container
     domManager.addNodeChild(parentContainer, divTask);
     domManager.addNodeChild(divTask, checkBoxDone.input);
     domManager.addNodeChild(divTask, pTaskTitle);
     domManager.addNodeChild(divTask, pTaskDueDate);
     domManager.addNodeChild(divTask, btnManager.createTextButton('details', 'task-button details', () => {}));
-    domManager.addNodeChild(divTask, btnManager.createImageButton('pencil-circle.svg', 'task-button', () => {}));
+    domManager.addNodeChild(divTask, btnManager.createImageButton('pencil-circle.svg', 'task-button', () => {
+      this.#doManageTaskForm(taskFormArgs);
+    }));
     domManager.addNodeChild(divTask, btnManager.createImageButton('delete-circle.svg', 'task-button', () => {
-      if(this.taskController.remove(projectTitle, task.getTitle)) {
+      if(this.taskController.remove(taskFormArgs.projectTitle, taskFormArgs.taskTitle)) {
         divTask.remove();
       }
     }));

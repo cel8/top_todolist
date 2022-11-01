@@ -75,8 +75,8 @@ export class UiProjectController {
     domManager.addNodeChild(formMngProject, btnSubmit.input);
     // Set value when editing
     if(prjFormArgs.isEdit) {
-      editTextPrjTitle.input.value = project.title;
-      editTextPrjDescr.input.value = project.description;
+      editTextPrjTitle.input.value = project.getTitle;
+      editTextPrjDescr.input.value = project.getDescription;
     }
   }
   doAddProjectUI(parentContainer, projectTitle) {

@@ -12,12 +12,18 @@ export const taskPriority = {
 
 class Task {
   constructor(title, description, dueDate, priority) {
+    this.type = undefined;
     this.title = title;
     this.description = description || '';
     this.dueDate = dueDate || new Date();
     this.priority = taskPriority[priority] ? taskPriority[priority] : taskPriority.normal;
     this.done = false;
   }
+  /**
+   * @param {any} type
+   */
+  set setType(type) { this.type = type; }
+  get getType() { return this.type; }
   /**
    * @param {any} title
    */
@@ -49,6 +55,7 @@ export class TaskNote extends Task {
   constructor(title, description, dueDate, priority) {
     super(title, description, dueDate, priority);
     this.note = '';
+    this.type = taskType.note;
   }
   /**
    * @param {string} note
@@ -61,6 +68,7 @@ export class TaskCheckList extends Task {
   constructor(title, description, dueDate, priority) {
     super(title, description, dueDate, priority);
     this.setCheckList = new Set();
+    this.type = taskType.list;
   }
   get getCheckList() { return this.setCheckList; }
   addActivity(activity) {
@@ -72,19 +80,17 @@ export class TaskCheckList extends Task {
 }
 
 export class TaskFactory {
-  constructor() {
-    this.taskClass = TaskNote;
-  }
-  createTask(type, title, description = '', dueDate = undefined, priority = undefined) {
+  static createTask(type, title, description = '', dueDate = undefined, priority = undefined) {
+    let taskClass = TaskNote;
     switch(type) {
       case taskType.list:
-        this.taskClass = TaskCheckList;
+        taskClass = TaskCheckList;
         break;
       case taskType.note:
       default:
-        this.taskClass = TaskNote;
+        taskClass = TaskNote;
         break;
     }
-    return new this.taskClass(title, description, dueDate, priority);
+    return new taskClass(title, description, dueDate, priority);
   }
 }

@@ -119,3 +119,25 @@ export function createRadioButton(radioID, value, labelText = null, cbEvent = un
   }
   return { label: label, input: radioBtn, radio: radio.input };
 }
+
+export function createSelect(selectID, values, selectedValue = null, labelText = null, required = false) {
+  const label = labelText ? domManager.createNodeContent('label', labelText) : null;
+  const input = domManager.createNodeID('select', selectID);
+  input.setAttribute('type', 'radio');
+  values.forEach(v => {
+    const option = domManager.createNodeContent('option', v);
+    option.setAttribute('value', v);
+    if(selectedValue && v === selectedValue) {
+      option.setAttribute('selected', true);
+    }
+    domManager.addNodeChild(input, option);
+  })
+  input.required = required;
+  input.disabled = !(values.length > 1);
+  /* Set label when node exists */
+  if(label) {
+    label.htmlFor = selectID;
+    input.setAttribute('name', selectID);
+  }
+  return { label: label, input: input };
+}

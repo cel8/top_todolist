@@ -4,7 +4,6 @@ import { StorageController } from 'Controller/storage-controller.js';
 export class TaskController {
   constructor() {
     this.mapTasks = new Map();
-    this.taskFactory = new mTask.TaskFactory();
     this.storageController = new StorageController('taskTable');
   }
   static getInstance() {
@@ -15,7 +14,6 @@ export class TaskController {
   }
   load() {
     this.mapTasks = this.storageController.deserialize();
-    return this.mapTasks;
   }
   create(projectKey) {
     if(this.exist(projectKey)) return false;
@@ -39,18 +37,19 @@ export class TaskController {
   add(projectKey, task) {
     if(!this.exist(projectKey)) return false;
     if(this.#existTask(projectKey, task.title)) return false;
-    const taskType = ((task.list) && (task.list.length > 0))  ? mTask.taskType.list : mTask.taskType.note;
-    const objTask = this.taskFactory.createTask(taskType, 
-                                                task.title, 
-                                                task.description, 
-                                                task.dueDate, 
-                                                task.priority);
-    if(taskType === mTask.taskType.note) {
-      objTask.setNote = task.note;
-    } else {
-      // TODO: manage list
-    }
-    this.fetch(projectKey).push(objTask);
+    this.fetch(projectKey).push(this.createTask(task));
+    this.storageController.serialize(this.mapTasks);
+    return true;
+  }
+  remove(projectKey, title) {
+    if(!this.exist(projectKey)) return false;
+    const tasks = this.fetch(projectKey);
+    /* Save the number of projects */
+    const nTasks = tasks.length;
+    /* Filter projects */
+    this.mapTasks.set(projectKey, _.filter(tasks, (t => !(title.toLowerCase() === t.getTitle.toLowerCase()))));
+    /* Check for serialization */
+    if(this.fetch(projectKey).length === nTasks) return false;
     this.storageController.serialize(this.mapTasks);
     return true;
   }
@@ -60,14 +59,15 @@ export class TaskController {
     this.mapTasks.set(projectNewKey, this.mapTasks.get(projectOldKey));
     this.mapTasks.delete(projectOldKey);
     this.storageController.serialize(this.mapTasks);
+    return true;
   }
   createTask(task) {
     const taskType = ((task.list) && (task.list.length > 0))  ? mTask.taskType.list : mTask.taskType.note;
-    const objTask = this.taskFactory.createTask(taskType, 
-                                                task.title, 
-                                                task.description, 
-                                                task.dueDate, 
-                                                task.priority);
+    const objTask = mTask.TaskFactory.createTask(taskType, 
+                                           task.title, 
+                                           task.description, 
+                                           task.dueDate, 
+                                           task.priority);
     if(taskType === mTask.taskType.note) {
       objTask.setNote = task.note;
     } else {
@@ -84,8 +84,12 @@ export class TaskController {
     const tasks = this.fetch(projectKey);
     return _.findIndex(tasks, t => title.toLowerCase() === t.getTitle.toLowerCase());
   }
-  findTask(projectKey, titletitle) {
-    const index = this.#getIndex(projectKey, titletitle);
+  findTask(projectKey, title) {
+    const index = this.#getIndex(projectKey, title);
     return -1 !== index ? this.fetch(projectKey)[index] : null;
+  }
+  changeTaskState(projectKey, title, state) {
+    this.findTask(projectKey, title).setDone = state;
+    this.storageController.serialize(this.mapTasks);
   }
 }

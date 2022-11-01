@@ -17,9 +17,8 @@ export class ProjectController {
   }
   load() {
     this.projects = this.storageController.deserialize();
-    // FIXME: understand howto deserialize tasks 
+    // Load the tasks
     this.taskController.load();
-    return this.projects;
   }
   add(title, description = '') {
     if(this.exist(title)) return false;
@@ -48,7 +47,7 @@ export class ProjectController {
     const index = this.#getIndex(oldTitle);
     if(-1 === index) return false;
     if((oldTitle !== newTitle) && (this.exist(newTitle))) return false;
-    if(!this.taskController.migrate(oldTitle, newTitle)) return false;
+    if((oldTitle !== newTitle) && (!this.taskController.migrate(oldTitle, newTitle))) return false;
     this.projects[index].setTitle = newTitle;
     if(description) this.projects[index].setDescription = description;
     this.storageController.serialize(this.projects);
@@ -60,5 +59,13 @@ export class ProjectController {
   }
   #getIndex(title) {
     return _.findIndex(this.projects, p => title.toLowerCase() === p.getTitle.toLowerCase());
+  }
+  getProjects() {
+    return this.projects;
+  }
+  getProjectsTitle() {
+    const projectsTitle = [];
+    this.projects.forEach(p => projectsTitle.push(p.getTitle));
+    return projectsTitle;
   }
 }

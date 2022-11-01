@@ -18,13 +18,20 @@ export class StorageController {
       if(this.lStorageTableName === storageTable.projectTable) {
         data = jsonParseData.map((project) => new Project(project.title, project.description));
       } else {
-        // FIXME: improve this code
-        const taskFactory = new TaskFactory();
         data = new Map();
         jsonParseData.forEach((value, key) => {
+          // Initialize the Map value
           data.set(key, []);
+          // For each value in Map
           value.forEach(v => {
-            const task = taskFactory.createTask(taskType.note, v.title, v.description, v.dueDate, v.priority);
+            // Create a new task for map
+            const task = TaskFactory.createTask(v.type, v.title, v.description, v.dueDate, v.priority);
+            task.setDone = v.done;
+            if(taskType.note === taskType[v.type]) {
+              task.setNote = v.note;
+            } else {
+              // TODO: manage list
+            }
             data.get(key).push(task); 
           });  
         });
@@ -83,4 +90,3 @@ export class StorageController {
     return value;
   }
 }
-

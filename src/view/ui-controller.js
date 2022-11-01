@@ -12,12 +12,14 @@ import 'Assets/images/svg/calendar-week.svg';
 import 'Assets/images/svg/calendar-month.svg';
 import { setTimeout } from 'timers-promises';
 import { UiProjectController } from 'View/ui-project-controller';
+import { UiTaskController } from 'View/ui-task-controller.js';
 
 const body = document.querySelector('body');
 
 export class UiController {
   constructor() {
     this.uiProjectController = new UiProjectController();
+    this.uiTaskController = new UiTaskController();
   }
   #doLoadHeader() {
     const header  = document.querySelector('header');
@@ -26,6 +28,9 @@ export class UiController {
     domManager.createAddNodeImg('todo-list.gif', 'todo-list', header, 'icon');
     domManager.createAddNode('p', header, 'main-text', null, 'Task list');
     domManager.createAddNodeImg('calendar-blank.svg', 'today', header, 'icon');
+    domManager.addNodeChild(header, btnManager.createButton('Create task', 'plus-circle-outline.svg', 'project-button', () => {
+      this.uiTaskController.doCreateTask();
+    }));
     domManager.addNodeChild(body, header);
     imgMenu.onclick = async () => {
       await setTimeout(250);
@@ -58,9 +63,10 @@ export class UiController {
   #doLoadOverlay() {
     const overlay = document.querySelector('#overlay');
     const divOverlay = domManager.createAddNode('div', overlay);
-    domManager.createAddNode('form', divOverlay, 'form-manage-task');
     // Hide overlay
     domManager.toggleDisplayByNode(overlay);
+    domManager.toggleDisplayByNode(domManager.createAddNode('form', divOverlay, 'manage-form-task'));
+    domManager.toggleDisplayByNode(domManager.createAddNode('div', divOverlay, 'manage-details-task'));
   }
   doLoadUI() {
     this.#doLoadHeader();

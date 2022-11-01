@@ -120,7 +120,7 @@ export class UiProjectController {
     /* Toggle visibility */
     domManager.toggleDisplayByNode(formAddProject);
     /* Fetch projects */
-    this.projectController.getProjectsTitle().forEach(title => {
+    this.projectController.fetchTitles().forEach(title => {
       /* Esclude inbox because it has a different management */
       if(title.toLowerCase() !== 'inbox') {
         this.doAddProjectUI(divProjectContainer, title);

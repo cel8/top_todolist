@@ -60,10 +60,10 @@ export class ProjectController {
   #getIndex(title) {
     return _.findIndex(this.projects, p => title.toLowerCase() === p.getTitle.toLowerCase());
   }
-  getProjects() {
+  fetch() {
     return this.projects;
   }
-  getProjectsTitle() {
+  fetchTitles() {
     const projectsTitle = [];
     this.projects.forEach(p => projectsTitle.push(p.getTitle));
     return projectsTitle;

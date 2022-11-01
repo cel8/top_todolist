@@ -109,7 +109,7 @@ export class UiTaskController {
       selected: null,
       values: []
     };
-    option.values = (!taskFormArgs.projectTitle || taskFormArgs.isEdit) ? this.projectController.getProjectsTitle() 
+    option.values = (!taskFormArgs.projectTitle || taskFormArgs.isEdit) ? this.projectController.fetchTitles() 
                                                                         : [ taskFormArgs.projectTitle ];
     option.selected = taskFormArgs.isEdit ? taskFormArgs.projectTitle : null;
     // Create input

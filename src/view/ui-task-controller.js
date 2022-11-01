@@ -313,6 +313,7 @@ export class UiTaskController {
     const project = this.projectController.find(projectTitle);
     // Load project title and description
     const divProject = domManager.createAddNode('div', main, 'task-project');
+    // TODO: ordering tasks using a button
     const divTaskContainer = domManager.createNode('div', 'task-container');
     const tasks = this.taskController.fetch(projectTitle);
     tasks.forEach(t => this.doAddTaskUI(divTaskContainer, projectTitle, t))

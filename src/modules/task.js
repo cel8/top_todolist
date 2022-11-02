@@ -64,18 +64,67 @@ export class TaskNote extends Task {
   get getNote() { return this.note; }
 }
 
+class Activity {
+  constructor(id, action, state) {
+    this.id = id;
+    this.action = action;
+    this.done = state ? true : false;
+  }
+  /**
+   * @param {any} id
+   */
+  set setID(id) { this.id = id; }
+  get getID() { return this.id; }
+  /**
+   * @param {string} action
+   */
+  set setAction(action) { this.action = action; }
+  get getAction() { return this.action; }
+  /**
+   * @param {boolean} state
+   */
+  set setDone(state) { this.done = state ? true : false; }
+  get getDone() { return this.done; }
+}
+
 export class TaskCheckList extends Task {
   constructor(title, description, dueDate, priority) {
     super(title, description, dueDate, priority);
-    this.setCheckList = new Set();
+    this.checkList = [];
     this.type = taskType.list;
   }
-  get getCheckList() { return this.setCheckList; }
-  addActivity(activity) {
-    this.setCheckList.add(activity);
+  /**
+   * @param {any} checkList
+   */
+  set setCheckList(checkList) { this.checkList = checkList; }
+  get getCheckList() { return this.checkList; }
+  add(id, action, state = false) {
+    if(!this.exist(id)) {
+      this.checkList.push(new Activity(id, action, state));
+    } else {
+      this.edit(id, action, state);
+    }
   }
-  deleteActivity(activity) {
-    this.setCheckList.delete(activity);
+  remove(id) {
+    this.checkList = _.filter(this.checkList, a => a.getID !== id);
+  }
+  edit(id, action, state) {
+    const idx = _.findIndex(this.checkList, a => id === a.getID);
+    if(-1 === idx) return;
+    this.checkList[idx].setAction = action;
+    this.checkList[idx].setDone = state;
+  }
+  changeState(id, state) {
+    const idx = _.findIndex(this.checkList, a => id === a.getID);
+    if(-1 === idx) return;
+    this.checkList[idx].setDone = state;
+  }
+  clear() {
+    this.checkList.splice(0, this.checkList.length);
+  }
+  exist(id) {
+    if(0 == this.checkList.length) return false;
+    else return _.some(this.checkList, a => id === a.getID);
   }
 }
 

@@ -31,6 +31,13 @@ export class UiTaskController {
     };
     // Add event
     const cbEventAdd = () => {
+      const activities = [];
+      checkListTasks.forEach((div, idx) => {
+        const action = div.querySelector('#taskItemCheckList').value;
+        if(action) {
+          activities.push({ id: idx, action: action, done: false });
+        }
+      });
       // TODO: add task in list
       const task = this.taskController.createTask({
         title: editTextTaskTitle.input.value,
@@ -38,7 +45,7 @@ export class UiTaskController {
         dueDate: dueDateTask.input.value,
         priority: radioBtnPriority.find(item => item.radio.checked === true).radio.value,
         note: editTextTaskNote.input.value,
-        list: []
+        list: activities
       });
       const projectTitle = taskFormArgs.projectTitle ? taskFormArgs.projectTitle
                                                      : selectProject.input.value;
@@ -261,6 +268,22 @@ export class UiTaskController {
       }
     } else {
       // TODO: manage optional
+      task.getCheckList.forEach(a => {
+        const divActivity = domManager.createNode('div', 'task-activity');
+        divActivity.dataset.activityID = a.getID;
+        const activityCheckBox = inputManager.createCheckBox('activityID', a.getAction, () => {
+          this.taskController.changeTaskActivityState(projectTitle, task.getTitle, a.getID, activityCheckBox.input.checked);
+        }, a.getDone);
+        domManager.addNodeChild(divActivity, activityCheckBox.input);
+        domManager.addNodeChild(divActivity, activityCheckBox.label);
+        domManager.addNodeChild(divActivity, btnManager.createImageButton('delete-circle.svg', 'task-button', () => {
+          this.taskController.removeTaskActivity(projectTitle, task.getTitle, a.getID);
+          divActivity.remove();
+        }));
+        domManager.addNodeChild(divTaskOptional, divActivity);
+        domManager.toggleDisplayByNode(divTaskOptional);
+        hide = true; // TODO: not working good on list
+      });
     }
     // Hide form and overlay
     divMngTaskDetails.querySelector('.task-button').onclick = () => {

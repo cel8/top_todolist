@@ -30,7 +30,7 @@ export class StorageController {
             if(taskType.note === taskType[v.type]) {
               task.setNote = v.note;
             } else {
-              // TODO: manage list
+              v.checkList.forEach(a => task.add(a.id, a.action, a.done));
             }
             data.get(key).push(task); 
           });  

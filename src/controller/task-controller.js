@@ -36,8 +36,8 @@ export class TaskController {
   }
   add(projectKey, task) {
     if(!this.exist(projectKey)) return false;
-    if(this.#existTask(projectKey, task.title)) return false;
-    this.fetch(projectKey).push(this.createTask(task));
+    if(this.#existTask(projectKey, task.getTitle)) return false;
+    this.fetch(projectKey).push(task);
     this.storageController.serialize(this.mapTasks);
     return true;
   }
@@ -64,14 +64,14 @@ export class TaskController {
   createTask(task) {
     const taskType = ((task.list) && (task.list.length > 0))  ? mTask.taskType.list : mTask.taskType.note;
     const objTask = mTask.TaskFactory.createTask(taskType, 
-                                           task.title, 
-                                           task.description, 
-                                           task.dueDate, 
-                                           task.priority);
+                                                 task.title, 
+                                                 task.description, 
+                                                 task.dueDate, 
+                                                 task.priority);
     if(taskType === mTask.taskType.note) {
       objTask.setNote = task.note;
     } else {
-      // TODO: manage list
+      task.list.forEach(a => objTask.add(a.id, a.action, a.done));
     }
     return objTask;
   }
@@ -127,5 +127,23 @@ export class TaskController {
     }
     this.storageController.serialize(this.mapTasks);
     return true;
+  }
+  editTaskActivity(projectKey, title, activity) {
+    const task = this.findTask(projectKey, title);
+    if(!task) return;
+    task.edit(activity.id, activity.action, activity.state);
+    this.storageController.serialize(this.mapTasks);
+  }
+  changeTaskActivityState(projectKey, title, activityID, state) {
+    const task = this.findTask(projectKey, title);
+    if(!task) return;
+    task.changeState(activityID, state);
+    this.storageController.serialize(this.mapTasks);
+  }
+  removeTaskActivity(projectKey, title, activityID) {
+    const task = this.findTask(projectKey, title);
+    if(!task) return;
+    task.remove(activityID);
+    this.storageController.serialize(this.mapTasks);
   }
 }

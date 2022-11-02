@@ -1,4 +1,4 @@
-import 'Style/style.css';
+import 'Style/style.css'; // TODO: manage style (totally incomplete).
 import * as domManager from 'Utilities/dom-manager.js';
 import * as btnManager from 'Utilities/button.js';
 import 'Assets/images/svg/menu.svg';
@@ -23,6 +23,7 @@ export class UiController {
   }
   #doLoadHeader() {
     const header  = document.querySelector('header');
+    // TODO: missing some callback handler
     const imgMenu = domManager.createAddNodeImg('menu.svg', 'menu', header, 'icon');
     const imgHome = domManager.createAddNodeImg('home-outline.svg', 'home', header, 'icon');
     domManager.createAddNodeImg('todo-list.gif', 'todo-list', header, 'icon');
@@ -34,7 +35,7 @@ export class UiController {
     domManager.addNodeChild(body, header);
     imgMenu.onclick = async () => {
       await setTimeout(250);
-      domManager.toggleDisplay('nav');
+      domManager.toggleDisplay('nav'); // TODO: fix grid size and column on menu click
     }
   }
   #doLoadMainContent() {

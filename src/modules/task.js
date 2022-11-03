@@ -10,6 +10,7 @@ export const taskPriority = {
   low: 'low'
 }
 
+// TODO: instead of using title as primary key, it should have a numeric ID 
 class Task {
   constructor(title, description, dueDate, priority) {
     this.type = undefined;

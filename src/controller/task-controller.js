@@ -122,7 +122,7 @@ export class TaskController {
       if(newTask.getType === mTask.taskType.note) {
         this.fetch(projectKey)[idxOldTask].setNote = newTask.getNote;
       } else {
-        // TODO: manage list
+        this.fetch(projectKey)[idxOldTask].setCheckList = newTask.getCheckList;
       }
     }
     this.storageController.serialize(this.mapTasks);

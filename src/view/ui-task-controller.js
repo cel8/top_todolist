@@ -30,23 +30,7 @@ export class UiTaskController {
       domManager.toggleDisplayByNode(formMngTask);
     };
     // Add event
-    const cbEventAdd = () => {
-      const activities = [];
-      checkListTasks.forEach((div, idx) => {
-        const action = div.querySelector('#taskItemCheckList').value;
-        if(action) {
-          activities.push({ id: idx, action: action, done: false });
-        }
-      });
-      // TODO: add task in list
-      const task = this.taskController.createTask({
-        title: editTextTaskTitle.input.value,
-        description: editTextTaskDescr.input.value,
-        dueDate: dueDateTask.input.value,
-        priority: radioBtnPriority.find(item => item.radio.checked === true).radio.value,
-        note: editTextTaskNote.input.value,
-        list: activities
-      });
+    const cbEventAdd = (task) => {
       const projectTitle = taskFormArgs.projectTitle ? taskFormArgs.projectTitle
                                                      : selectProject.input.value;
       // Add the new task to project 
@@ -55,16 +39,7 @@ export class UiTaskController {
       }
     };
     // Edit event
-    const cbEventEdit = () => {
-      // TODO: add task in list
-      const task = this.taskController.createTask({
-        title: editTextTaskTitle.input.value,
-        description: editTextTaskDescr.input.value,
-        dueDate: dueDateTask.input.value,
-        priority: radioBtnPriority.find(item => item.radio.checked === true).radio.value,
-        note: editTextTaskNote.input.value,
-        list: []
-      });
+    const cbEventEdit = (task) => {
       if(taskFormArgs.projectTitle !== selectProject.input.value) { 
         // Relocate task
         if(this.taskController.relocate(taskFormArgs.projectTitle, 
@@ -99,7 +74,24 @@ export class UiTaskController {
     // TODO: need to implement form validation
     const cbEventSubmit = (e) => {
       e.preventDefault();
-      taskFormArgs.isEdit ? cbEventEdit() : cbEventAdd();
+      const activities = [];
+      checkListTasks.forEach((div, idx) => {
+        const done = div.querySelector('#taskItemCheckListCbox').checked;
+        const action = div.querySelector('#taskItemCheckListEdit').value;
+        if(action) {
+          activities.push({ id: idx, action: action, done: done });
+        }
+      });
+      // Create a new task
+      const task = this.taskController.createTask({
+        title: editTextTaskTitle.input.value,
+        description: editTextTaskDescr.input.value,
+        dueDate: dueDateTask.input.value,
+        priority: radioBtnPriority.find(item => item.radio.checked === true).radio.value,
+        note: editTextTaskNote.input.value,
+        list: activities
+      });
+      taskFormArgs.isEdit ? cbEventEdit(task) : cbEventAdd(task);
       cbFinalizeForm();
     };
     // Edit priority event
@@ -110,12 +102,35 @@ export class UiTaskController {
         }
       });
     }
-    // Checklist event
+    // Create checklist content
+    const cbCheckListCreateActivity = (parent, activity = undefined) => {
+      // Create a new item
+      const checkBoxItem = inputManager.createCheckBox('taskItemCheckListCbox');
+      const editTextItem = inputManager.createEditText('taskItemCheckListEdit', 'Item in task checklist', null, false);
+      // Edit activity
+      if(activity) {
+        checkBoxItem.input.checked = activity.getDone;
+        editTextItem.input.value = activity.getAction;
+      }
+      const divChecklistItem = domManager.createNode('div')
+      domManager.addNodeChild(divChecklistItem, checkBoxItem.input);
+      domManager.addNodeChild(divChecklistItem, editTextItem.input);
+      domManager.addNodeChild(divChecklistItem, inputManager.createImageButton('removeTaskItem', 'delete-circle.svg', 'task-button', () => {
+        const index = _.indexOf(checkListTasks, divChecklistItem);
+        if(index !== -1) {
+          checkListTasks.splice(index, 1);
+          divChecklistItem.remove();
+        }
+      }).input);
+      checkListTasks.push(divChecklistItem);
+      domManager.addNodeChild(parent, checkListTasks.at(-1));
+    } 
+    // Change task type event
     const cbEventChangeTaskType = () => {
       // Detects for content
       if(('' !== editTextTaskNote.input.value) ||
          (0 !== checkListTasks.length &&
-          _.some(checkListTasks, item => '' !== item.querySelector('input').value))) {
+          _.some(checkListTasks, item => '' !== item.querySelector('#taskItemCheckListEdit').value))) {
         // Notify to user that everything will be discarded
         if(!window.confirm("Warning: do you want to discard everything?")) {
           return false;
@@ -131,20 +146,9 @@ export class UiTaskController {
         domManager.addNodeChild(divOptional, inputManager.createButton('addTaskItem', 'Add item in checklist', 'plus-circle-outline.svg', 'task-button', () => {
           // Fill last item first
           if(0 !== checkListTasks.length &&
-            '' === checkListTasks.at(-1).querySelector('input').value) return;
+            '' === checkListTasks.at(-1).querySelector('#taskItemCheckListEdit').value) return;
           // Create a new item
-          const editTextItem = inputManager.createEditText('taskItemCheckList', 'Item in task checklist', null, false);
-          const divChecklistItem = domManager.createNode('div')
-          domManager.addNodeChild(divChecklistItem, editTextItem.input);
-          domManager.addNodeChild(divChecklistItem, inputManager.createImageButton('removeTaskItem', 'delete-circle.svg', 'task-button', () => {
-            const index = _.indexOf(checkListTasks, divChecklistItem);
-            if(index !== -1) {
-              checkListTasks.splice(index, 1);
-              divChecklistItem.remove();
-            }
-          }).input);
-          checkListTasks.push(divChecklistItem);
-          domManager.addNodeChild(divOptional, checkListTasks.at(-1));
+          cbCheckListCreateActivity(divOptional);
         }).input);
       } else {
         // Add edit box
@@ -175,6 +179,7 @@ export class UiTaskController {
         inputManager.createRadioButton(`priority-${taskPriority[property]}`, property, null, cbEventEditPriority, (property === taskPriority.low))
       );
     }
+    // TODO: only the switch is not clear enough, because it does not tell to the user about the task type (not user friendly)
     const switchTaskType    = inputManager.createSwitchButton('switchTaskType', true, 'Change task type', cbEventChangeTaskType);
     const divOptional       = domManager.createNode('div', 'optional-content');
     const editTextTaskNote  = inputManager.createEditText('taskNote', 'Task notes', null, false);
@@ -189,9 +194,25 @@ export class UiTaskController {
       radioBtnPriority.forEach(item => item.radio.checked = (item.radio.value === projectTask.getPriority));
       // Update optional data
       if(projectTask.getType === taskType.note) {
-        editTextTaskNote.input.value = projectTask.getNote;
+        editTextTaskNote.input.value = (projectTask.getNote ? projectTask.getNote : '');
+        domManager.addNodeChild(divOptional, editTextTaskNote.input);
       } else {
-        // TODO: manage list
+        // Insert add new item in checklist
+        domManager.addNodeChild(divOptional, inputManager.createButton('addTaskItem', 'Add item in checklist', 'plus-circle-outline.svg', 'task-button', () => {
+          // Fill last item first
+          if(0 !== checkListTasks.length &&
+            '' === checkListTasks.at(-1).querySelector('#taskItemCheckListEdit').value) return;
+          // Create a new item
+          cbCheckListCreateActivity(divOptional);
+        }).input);
+        // Get the checklist
+        const list = (projectTask.getCheckList ? projectTask.getCheckList : []);
+        list.forEach(a => {
+          // Insert the editable activity
+          cbCheckListCreateActivity(divOptional, a);
+        });
+        // Set switch to checked
+        switchTaskType.checkbox.checked = true;
       }
     }
     /* Add input child */
@@ -209,7 +230,7 @@ export class UiTaskController {
     domManager.addNodeChild(divInput, switchTaskType.input);
     domManager.addNodeChild(divInput, divOptional);
     domManager.addNodeChild(formMngTask, divInput);
-    domManager.addNodeChild(divOptional, editTextTaskNote.input);
+    if(!taskFormArgs.isEdit) domManager.addNodeChild(divOptional, editTextTaskNote.input);
     domManager.addNodeChild(formMngTask, btnCancel.input);
     domManager.addNodeChild(formMngTask, btnSubmit.input);
   }
@@ -271,7 +292,7 @@ export class UiTaskController {
         task.getCheckList.forEach(a => {
           const divActivity = domManager.createNode('div', 'task-activity');
           divActivity.dataset.activityID = a.getID;
-          const activityCheckBox = inputManager.createCheckBox('activityID', a.getAction, () => {
+          const activityCheckBox = inputManager.createCheckBox(`activityID-${a.getID}`, a.getAction, () => {
             this.taskController.changeTaskActivityState(projectTitle, task.getTitle, a.getID, activityCheckBox.input.checked);
           }, a.getDone);
           domManager.addNodeChild(divActivity, activityCheckBox.input);

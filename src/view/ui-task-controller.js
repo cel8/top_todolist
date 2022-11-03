@@ -267,23 +267,25 @@ export class UiTaskController {
         hide = true;
       }
     } else {
-      // TODO: manage optional
-      task.getCheckList.forEach(a => {
-        const divActivity = domManager.createNode('div', 'task-activity');
-        divActivity.dataset.activityID = a.getID;
-        const activityCheckBox = inputManager.createCheckBox('activityID', a.getAction, () => {
-          this.taskController.changeTaskActivityState(projectTitle, task.getTitle, a.getID, activityCheckBox.input.checked);
-        }, a.getDone);
-        domManager.addNodeChild(divActivity, activityCheckBox.input);
-        domManager.addNodeChild(divActivity, activityCheckBox.label);
-        domManager.addNodeChild(divActivity, btnManager.createImageButton('delete-circle.svg', 'task-button', () => {
-          this.taskController.removeTaskActivity(projectTitle, task.getTitle, a.getID);
-          divActivity.remove();
-        }));
-        domManager.addNodeChild(divTaskOptional, divActivity);
+      if(task.getCheckList.length > 0) {
+        task.getCheckList.forEach(a => {
+          const divActivity = domManager.createNode('div', 'task-activity');
+          divActivity.dataset.activityID = a.getID;
+          const activityCheckBox = inputManager.createCheckBox('activityID', a.getAction, () => {
+            this.taskController.changeTaskActivityState(projectTitle, task.getTitle, a.getID, activityCheckBox.input.checked);
+          }, a.getDone);
+          domManager.addNodeChild(divActivity, activityCheckBox.input);
+          domManager.addNodeChild(divActivity, activityCheckBox.label);
+          domManager.addNodeChild(divActivity, btnManager.createImageButton('delete-circle.svg', 'task-button', () => {
+            this.taskController.removeTaskActivity(projectTitle, task.getTitle, a.getID);
+            divActivity.remove();
+          }));
+          domManager.addNodeChild(divTaskOptional, divActivity);
+        });
+        // Toggle visibility and onexit will hide the item      
         domManager.toggleDisplayByNode(divTaskOptional);
-        hide = true; // TODO: not working good on list
-      });
+        hide = true;
+      }
     }
     // Hide form and overlay
     divMngTaskDetails.querySelector('.task-button').onclick = () => {

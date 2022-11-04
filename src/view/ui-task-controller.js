@@ -1,5 +1,5 @@
 import { ProjectController } from 'Controller/project-controller.js';
-import { TaskController } from 'Controller/task-controller.js';
+import { TaskController, taskSortMode } from 'Controller/task-controller.js';
 import * as domManager from 'Utilities/dom-manager.js';
 import * as btnManager from 'Utilities/button.js';
 import * as inputManager from 'Utilities/input-manager.js';
@@ -10,10 +10,13 @@ import _ from 'lodash';
 const overlay = document.querySelector('#overlay');
 const main = document.querySelector('main');
 
+
+
 export class UiTaskController {
   constructor() {
     this.projectController = ProjectController.getInstance();
     this.taskController = TaskController.getInstance();
+    this.currentSortMode = taskSortMode.addDateAscending;
   }
   #doManageTaskForm(taskFormArgs) {
     const formMngTask = overlay.querySelector('form');
@@ -353,6 +356,8 @@ export class UiTaskController {
     this.#doManageTaskForm({isEdit: false});
   }
   doLoadProjectTask(projectTitle) {
+    // Initialize the current sort mode
+    this.currentSortMode = taskSortMode.addDateAscending;
     // Remove main content
     domManager.removeAllChildNodes(main);
     // Find project
@@ -362,7 +367,7 @@ export class UiTaskController {
     // TODO: ordering tasks using a button
     const divTaskContainer = domManager.createNode('div', 'task-container');
     const tasks = this.taskController.fetch(projectTitle);
-    tasks.forEach(t => this.doAddTaskUI(divTaskContainer, projectTitle, t))
+    tasks.forEach(t => this.doAddTaskUI(divTaskContainer, projectTitle, t));
     domManager.addNodeChild(divProject, domManager.createNodeContent('p', projectTitle));
     domManager.addNodeChild(divProject, domManager.createNodeContent('p', project.getDescription));
     /* Add project button */
@@ -375,6 +380,19 @@ export class UiTaskController {
     });
     btnAddTask.classList.add('add-task-btn');
     domManager.addNodeChild(main, btnAddTask);
+    // Create a sort selector
+    const option = []; // TODO: insert and edit task and order in dom
+    for (const property in taskSortMode) {
+      option.push(property);
+    }
+    const selectSortType = inputManager.createSelect('selectSortTaskID', option, taskSortMode.addDateAscending, 'Sort');
+    selectSortType.input.onchange = () => {
+      domManager.removeAllChildNodes(divTaskContainer);
+      const tasks = this.taskController.fetchSorted(projectTitle, selectSortType.input.value);
+      tasks.forEach(t => this.doAddTaskUI(divTaskContainer, projectTitle, t));
+    }
+    domManager.addNodeChild(main, selectSortType.label);
+    domManager.addNodeChild(main, selectSortType.input);
     domManager.addNodeChild(main, divTaskContainer);
   }
 }

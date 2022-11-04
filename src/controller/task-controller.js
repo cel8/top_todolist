@@ -1,6 +1,15 @@
 import * as mTask from 'Modules/task.js';
 import { StorageController } from 'Controller/storage-controller.js';
 
+export const taskSortMode = {
+  addDateAscending:   'addDateAscending',
+  addDateDescending:  'addDateDescending',
+  dueDateAscending:   'dueDateAscending',
+  dueDateDescending:  'dueDateDescending',
+  alphabAscending:    'alphabAscending',
+  alphabDescending:   'alphabDescending'
+};
+
 export class TaskController {
   constructor() {
     this.mapTasks = new Map();
@@ -32,7 +41,30 @@ export class TaskController {
   }
   fetch(projectKey) {
     return this.exist(projectKey) ? this.mapTasks.get(projectKey) 
-                                  : null;
+                                  : [];
+  }
+  fetchSorted(projectKey, mode) {
+    if(!this.exist(projectKey)) return [];
+    let tasks = [...this.mapTasks.get(projectKey)];
+    switch(mode) {
+      case taskSortMode.alphabAscending:
+      case taskSortMode.alphabDescending:
+        tasks.sort((a,b) => a.getTitle.localeCompare(b.getTitle));
+        break;
+      case taskSortMode.dueDateAscending:
+      case taskSortMode.dueDateDescending:
+        tasks.sort((a,b) => { return new Date(a.getDueDate) - new Date(b.getDueDate) });
+        break;
+      default:
+        break;
+    }
+    // For descending mode reverse the buffer
+    if((mode === taskSortMode.dueDateDescending) ||
+       (mode === taskSortMode.addDateDescending) ||
+       (mode === taskSortMode.alphabDescending)) {
+      return tasks.reverse();
+    }
+    return tasks;
   }
   add(projectKey, task) {
     if(!this.exist(projectKey)) return false;

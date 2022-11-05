@@ -90,12 +90,11 @@ export class UiTaskController {
           activities.push({ id: idx, action: action, done: done });
         }
       });
-      const dueDate = dueDateTask.input.value && dueDateTask.input.value !== '' ? dueDateTask.input.value : undefined;
       // Create a new task
       const task = this.taskController.createTask({
         title: editTextTaskTitle.input.value,
         description: editTextTaskDescr.input.value,
-        dueDate: dueDate,
+        dueDate: dueDateTask.input.value,
         priority: radioBtnPriority.find(item => item.radio.checked === true).radio.value,
         note: editTextTaskNote.input.value,
         list: activities

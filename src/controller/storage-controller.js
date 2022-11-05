@@ -25,7 +25,7 @@ export class StorageController {
           // For each value in Map
           value.forEach(v => {
             // Create a new task for map
-            const task = TaskFactory.createTask(v.type, v.title, v.description, v.dueDate, v.priority);
+            const task = TaskFactory.createTask(v.type, v.id, v.title, v.description, v.dueDate, v.priority);
             task.setDone = v.done;
             if(taskType.note === taskType[v.type]) {
               task.setNote = v.note;

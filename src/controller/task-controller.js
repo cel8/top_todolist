@@ -1,5 +1,6 @@
 import * as mTask from 'Modules/task.js';
 import { StorageController } from 'Controller/storage-controller.js';
+import { v4 as uuidv4 } from 'uuid';
 
 export const taskSortMode = {
   addDateAscending:   'Add date ascending',
@@ -86,18 +87,18 @@ export class TaskController {
   }
   add(projectKey, task) {
     if(!this.exist(projectKey)) return false;
-    if(this.#existTask(projectKey, task.getTitle)) return false;
+    if(this.#existTask(projectKey, task.getID)) return false;
     this.fetch(projectKey).push(task);
     this.storageController.serialize(this.mapTasks);
     return true;
   }
-  remove(projectKey, title) {
+  remove(projectKey, id) {
     if(!this.exist(projectKey)) return false;
     const tasks = this.fetch(projectKey);
     /* Save the number of projects */
     const nTasks = tasks.length;
     /* Filter projects */
-    this.mapTasks.set(projectKey, _.filter(tasks, (t => !(title.toLowerCase() === t.getTitle.toLowerCase()))));
+    this.mapTasks.set(projectKey, _.filter(tasks, (t => !(id === t.getID))));
     /* Check for serialization */
     if(this.fetch(projectKey).length === nTasks) return false;
     this.storageController.serialize(this.mapTasks);
@@ -114,6 +115,7 @@ export class TaskController {
   createTask(task) {
     const taskType = ((task.list) && (task.list.length > 0))  ? mTask.taskType.list : mTask.taskType.note;
     const objTask = mTask.TaskFactory.createTask(taskType, 
+                                                 uuidv4(),
                                                  task.title, 
                                                  task.description, 
                                                  task.dueDate, 
@@ -125,45 +127,46 @@ export class TaskController {
     }
     return objTask;
   }
-  #existTask(projectKey, title) {
+  #existTask(projectKey, id) {
     const tasks = this.fetch(projectKey);
     if(0 == tasks.length) return false;
-    else return _.some(tasks, t => title.toLowerCase() === t.getTitle.toLowerCase());
+    else return _.some(tasks, t => id === t.getID);
   }
-  #getIndex(projectKey, title) {
+  #getIndex(projectKey, id) {
     const tasks = this.fetch(projectKey);
-    return _.findIndex(tasks, t => title.toLowerCase() === t.getTitle.toLowerCase());
+    return _.findIndex(tasks, t => id === t.getID);
   }
-  findTask(projectKey, title) {
-    const index = this.#getIndex(projectKey, title);
+  findTask(projectKey, id) {
+    const index = this.#getIndex(projectKey, id);
     return -1 !== index ? this.fetch(projectKey)[index] : null;
   }
-  changeTaskState(projectKey, title, state) {
-    this.findTask(projectKey, title).setDone = state;
+  changeTaskState(projectKey, id, state) {
+    this.findTask(projectKey, id).setDone = state;
     this.storageController.serialize(this.mapTasks);
   }
-  relocate(oldProjectKey, newProjectKey, oldTitle, newTask) {
-    // Check if new task title already exists in new project
-    const idxNewTask = this.#getIndex(newProjectKey, newTask.getTitle);
+  relocate(oldProjectKey, newProjectKey, oldID, newTask) {
+    // Check if new task id already exists in new project
+    const idxNewTask = this.#getIndex(newProjectKey, newTask.getID);
     if(-1 !== idxNewTask) return false;
     // Edit thew new task
-    if(!this.edit(oldProjectKey, oldTitle, newTask)) return false;
+    if(!this.edit(oldProjectKey, oldID, newTask)) return false;
     // Move task in the new project and remove the old one
-    this.add(newProjectKey, this.findTask(oldProjectKey, newTask.getTitle));
-    this.remove(oldProjectKey, newTask.getTitle);
+    this.add(newProjectKey, this.findTask(oldProjectKey, newTask.getID));
+    this.remove(oldProjectKey, newTask.getID);
     this.storageController.serialize(this.mapTasks);
     return true;
   }
-  edit(projectKey, oldTitle, newTask) {
-    const idxOldTask = this.#getIndex(projectKey, oldTitle);
+  edit(projectKey, oldID, newTask) {
+    const idxOldTask = this.#getIndex(projectKey, oldID);
     if(-1 === idxOldTask) return false;
     const oldTask = this.fetch(projectKey)[idxOldTask];
-    if((oldTitle !== newTask.getTitle) && (this.#existTask(projectKey, newTask.getTitle))) return false;
+    if((oldID !== newTask.getID) && (this.#existTask(projectKey, newTask.getID))) return false;
     // Change task type (remove old and insert it again)
     if(oldTask.getType !== newTask.getType) {
-      this.remove(projectKey, oldTitle);
+      this.remove(projectKey, oldID);
       this.add(projectKey, newTask);
     } else {
+      this.fetch(projectKey)[idxOldTask].setID = newTask.getID;
       this.fetch(projectKey)[idxOldTask].setTitle = newTask.getTitle;
       this.fetch(projectKey)[idxOldTask].setDescription = newTask.getDescription;
       this.fetch(projectKey)[idxOldTask].setDueDate = newTask.getDueDate;
@@ -178,20 +181,20 @@ export class TaskController {
     this.storageController.serialize(this.mapTasks);
     return true;
   }
-  editTaskActivity(projectKey, title, activity) {
-    const task = this.findTask(projectKey, title);
+  editTaskActivity(projectKey, id, activity) {
+    const task = this.findTask(projectKey, id);
     if(!task) return;
     task.edit(activity.id, activity.action, activity.state);
     this.storageController.serialize(this.mapTasks);
   }
-  changeTaskActivityState(projectKey, title, activityID, state) {
-    const task = this.findTask(projectKey, title);
+  changeTaskActivityState(projectKey, id, activityID, state) {
+    const task = this.findTask(projectKey, id);
     if(!task) return;
     task.changeState(activityID, state);
     this.storageController.serialize(this.mapTasks);
   }
-  removeTaskActivity(projectKey, title, activityID) {
-    const task = this.findTask(projectKey, title);
+  removeTaskActivity(projectKey, id, activityID) {
+    const task = this.findTask(projectKey, id);
     if(!task) return;
     task.remove(activityID);
     this.storageController.serialize(this.mapTasks);

@@ -10,16 +10,21 @@ export const taskPriority = {
   low: 'low'
 }
 
-// TODO: instead of using title as primary key, it should have a numeric ID 
 class Task {
-  constructor(title, description, dueDate, priority) {
+  constructor(id, title, description, dueDate, priority) {
     this.type = undefined;
+    this.id = id;
     this.title = title;
     this.description = description || '';
     this.dueDate = dueDate || '';
     this.priority = taskPriority[priority] ? taskPriority[priority] : taskPriority.normal;
     this.done = false;
   }
+  /**
+   * @param {any} id
+   */
+  set setID(id) { this.id = id; }
+  get getID() { return this.id; }
   /**
    * @param {any} type
    */
@@ -53,8 +58,8 @@ class Task {
 }
 
 export class TaskNote extends Task {
-  constructor(title, description, dueDate, priority) {
-    super(title, description, dueDate, priority);
+  constructor(id, title, description, dueDate, priority) {
+    super(id, title, description, dueDate, priority);
     this.note = '';
     this.type = taskType.note;
   }
@@ -89,8 +94,8 @@ class Activity {
 }
 
 export class TaskCheckList extends Task {
-  constructor(title, description, dueDate, priority) {
-    super(title, description, dueDate, priority);
+  constructor(id, title, description, dueDate, priority) {
+    super(id, title, description, dueDate, priority);
     this.checkList = [];
     this.type = taskType.list;
   }
@@ -130,7 +135,7 @@ export class TaskCheckList extends Task {
 }
 
 export class TaskFactory {
-  static createTask(type, title, description = '', dueDate = undefined, priority = undefined) {
+  static createTask(type, id, title, description = '', dueDate = undefined, priority = undefined) {
     let taskClass = TaskNote;
     switch(type) {
       case taskType.list:
@@ -141,6 +146,6 @@ export class TaskFactory {
         taskClass = TaskNote;
         break;
     }
-    return new taskClass(title, description, dueDate, priority);
+    return new taskClass(id, title, description, dueDate, priority);
   }
 }

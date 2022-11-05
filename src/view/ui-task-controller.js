@@ -385,6 +385,22 @@ export class UiTaskController {
     const tasks = this.taskController.fetchSorted(projectTitle, mode);
     tasks.forEach(t => this.doAddTaskUI(parentContainer, projectTitle, t));
   }
+  doEditProjectTitle(oldProjectTitle, project) {
+    // Check if project is currently onscreen
+    const pTitleProject = document.querySelector('.task-project > p:first-of-type');
+    if(pTitleProject && pTitleProject.textContent === oldProjectTitle) {
+      pTitleProject.textContent = project.title;
+      document.querySelector('.task-project > p:last-of-type').textContent = project.description;
+    }
+  }
+  doRemoveProject(projectTitle) {
+    // Check if project is currently onscreen
+    const pTitleProject = document.querySelector('.task-project > p:first-of-type');
+    if(pTitleProject && pTitleProject.textContent === projectTitle) {
+      // Remove main content
+      domManager.removeAllChildNodes(main);
+    }
+  }
   doLoadProjectTask(projectTitle) {
     // Initialize the current sort mode
     this.currentSortMode = taskSortMode.addDateAscending;

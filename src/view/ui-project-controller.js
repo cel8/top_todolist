@@ -46,6 +46,8 @@ export class UiProjectController {
     const cbEventEdit = () => {
       if(this.projectController.edit(project.title, editTextPrjTitle.input.value, editTextPrjDescr.input.value)) {
         /* Update project title */
+        this.uiTaskController.doEditProjectTitle(prjFormArgs.projectTitle, 
+                                                 { title: editTextPrjTitle.input.value, description: editTextPrjDescr.input.value });
         prjFormArgs.projectTitle = editTextPrjTitle.input.value;
         btnManager.editButtonText(prjFormArgs.projectBtn, prjFormArgs.projectTitle);
       }
@@ -87,7 +89,6 @@ export class UiProjectController {
       projectTitle: projectTitle,
       projectBtn: null
     };
-    // TODO: need to remove or refresh tasks on edit/remove
     const nodeProject = domManager.createNodeClass('div', 'project');
     const btnProject = btnManager.createButton(prjFormArgs.projectTitle, 'project.svg', 'project-button', () => {
       // TODO: stop editing #isEdit
@@ -104,6 +105,7 @@ export class UiProjectController {
       this.#toggleEditing();
       /* Remove project */
       this.projectController.remove(prjFormArgs.projectTitle);
+      this.uiTaskController.doRemoveProject(prjFormArgs.projectTitle);
       nodeProject.remove();
       /* Unlock editing */
       this.#toggleEditing();

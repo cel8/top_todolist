@@ -13,7 +13,7 @@ export class UiProjectController {
   #isEdit = false; /* Private edit field */
   constructor() {
     this.projectController = ProjectController.getInstance();
-    this.uiTaskController = new UiTaskController();
+    this.uiTaskController = UiTaskController.getInstance();
   }
   #isLocked() { return this.#isEdit === true; }
   #toggleEditing() {

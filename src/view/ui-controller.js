@@ -19,7 +19,7 @@ const body = document.querySelector('body');
 export class UiController {
   constructor() {
     this.uiProjectController = new UiProjectController();
-    this.uiTaskController = new UiTaskController();
+    this.uiTaskController = UiTaskController.getInstance();
   }
   #doLoadHeader() {
     const header  = document.querySelector('header');

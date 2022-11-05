@@ -2,18 +2,25 @@ import * as mTask from 'Modules/task.js';
 import { StorageController } from 'Controller/storage-controller.js';
 
 export const taskSortMode = {
-  addDateAscending:   'addDateAscending',
-  addDateDescending:  'addDateDescending',
-  dueDateAscending:   'dueDateAscending',
-  dueDateDescending:  'dueDateDescending',
-  alphabAscending:    'alphabAscending',
-  alphabDescending:   'alphabDescending'
+  addDateAscending:   'Add date ascending',
+  addDateDescending:  'Add date descending',
+  dueDateAscending:   'Due date ascending',
+  dueDateDescending:  'Due date descending',
+  alphabAscending:    'Alphabetically ascending',
+  alphabDescending:   'Alphabetically descending',
+  priorityAscending:  'Priority ascending',
+  priorityDescending: 'Priority descending'
 };
 
 export class TaskController {
   constructor() {
     this.mapTasks = new Map();
     this.storageController = new StorageController('taskTable');
+    this.taskPriorityLevel = new Map();
+    let level = 0;
+    for (const property in mTask.taskPriority) {
+      this.taskPriorityLevel.set(property, level++);
+    }
   }
   static getInstance() {
     if(!this.instance) {
@@ -53,7 +60,17 @@ export class TaskController {
         break;
       case taskSortMode.dueDateAscending:
       case taskSortMode.dueDateDescending:
-        tasks.sort((a,b) => { return new Date(a.getDueDate) - new Date(b.getDueDate) });
+        tasks.sort((a,b) => { 
+          const aDate = a.getDueDate ? new Date(a.getDueDate) : new Date();
+          const bDate = b.getDueDate ? new Date(b.getDueDate) : new Date();
+          return aDate - bDate; 
+        });
+        break;
+      case taskSortMode.priorityAscending:
+      case taskSortMode.priorityDescending:
+        tasks.sort((a,b) => {
+          return this.taskPriorityLevel.get(a.getPriority) - this.taskPriorityLevel.get(b.getPriority);
+        })
         break;
       default:
         break;
@@ -61,6 +78,7 @@ export class TaskController {
     // For descending mode reverse the buffer
     if((mode === taskSortMode.dueDateDescending) ||
        (mode === taskSortMode.addDateDescending) ||
+       (mode === taskSortMode.priorityDescending) ||
        (mode === taskSortMode.alphabDescending)) {
       return tasks.reverse();
     }

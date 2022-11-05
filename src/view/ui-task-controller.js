@@ -10,13 +10,17 @@ import _ from 'lodash';
 const overlay = document.querySelector('#overlay');
 const main = document.querySelector('main');
 
-
-
 export class UiTaskController {
   constructor() {
     this.projectController = ProjectController.getInstance();
     this.taskController = TaskController.getInstance();
     this.currentSortMode = taskSortMode.addDateAscending;
+  }
+  static getInstance() {
+    if(!this.instance) {
+      this.instance = new UiTaskController();
+    }
+    return this.instance;
   }
   #doManageTaskForm(taskFormArgs) {
     const formMngTask = overlay.querySelector('form');
@@ -94,7 +98,19 @@ export class UiTaskController {
         note: editTextTaskNote.input.value,
         list: activities
       });
-      taskFormArgs.isEdit ? cbEventEdit(task) : cbEventAdd(task);
+      taskFormArgs.isEdit ? cbEventEdit(task) : cbEventAdd(task);        
+      // Fill parent and project title for each case      
+      const parentContainer = !taskFormArgs.parentContainer ? document.querySelector('.task-container') : taskFormArgs.parentContainer;
+      let projectTitle = taskFormArgs.projectTitle;
+      if(!taskFormArgs.projectTitle) {
+        const pTitle = document.querySelector('.task-project > p:first-of-type');
+        if(pTitle) projectTitle = pTitle.textContent;
+      }
+      // Sort in DOM during add or edit (no relocate)
+      if((parentContainer) && 
+         (projectTitle === selectProject.input.value)) {
+        this.doReloadSorted(projectTitle, parentContainer, this.currentSortMode);
+      }
       cbFinalizeForm();
     };
     // Edit priority event
@@ -327,7 +343,8 @@ export class UiTaskController {
       projectTitle: projectTitle,
       taskTitle: task.getTitle,
       priorityLevel: task.getPriority,
-      divTask: divTask
+      divTask: divTask,
+      parentContainer: parentContainer
     };
     const checkBoxDone = inputManager.createCheckBox('checkBoxDone', null, () => {
       this.taskController.changeTaskState(taskFormArgs.projectTitle, taskFormArgs.taskTitle, checkBoxDone.input.checked);
@@ -354,6 +371,11 @@ export class UiTaskController {
   }
   doCreateTask() {
     this.#doManageTaskForm({isEdit: false});
+  }
+  doReloadSorted(projectTitle, parentContainer, mode) {
+    domManager.removeAllChildNodes(parentContainer);
+    const tasks = this.taskController.fetchSorted(projectTitle, mode);
+    tasks.forEach(t => this.doAddTaskUI(parentContainer, projectTitle, t));
   }
   doLoadProjectTask(projectTitle) {
     // Initialize the current sort mode
@@ -383,13 +405,14 @@ export class UiTaskController {
     // Create a sort selector
     const option = []; // TODO: insert and edit task and order in dom
     for (const property in taskSortMode) {
-      option.push(property);
+      option.push(taskSortMode[property]);
     }
     const selectSortType = inputManager.createSelect('selectSortTaskID', option, taskSortMode.addDateAscending, 'Sort');
     selectSortType.input.onchange = () => {
-      domManager.removeAllChildNodes(divTaskContainer);
-      const tasks = this.taskController.fetchSorted(projectTitle, selectSortType.input.value);
-      tasks.forEach(t => this.doAddTaskUI(divTaskContainer, projectTitle, t));
+      if(this.currentSortMode !== selectSortType.input.value) {
+        this.currentSortMode = selectSortType.input.value;
+        this.doReloadSorted(projectTitle, divTaskContainer, this.currentSortMode);
+      }
     }
     domManager.addNodeChild(main, selectSortType.label);
     domManager.addNodeChild(main, selectSortType.input);

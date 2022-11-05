@@ -120,6 +120,7 @@ body {
 
 header {
   display: flex;
+  grid-column-end: span 2;
 }
 
 /* Main content */

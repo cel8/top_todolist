@@ -35,7 +35,9 @@ export class UiController {
     domManager.addNodeChild(body, header);
     imgMenu.onclick = async () => {
       await setTimeout(250);
-      domManager.toggleDisplay('nav'); // TODO: fix grid size and column on menu click
+      const nav = document.querySelector('nav');
+      domManager.toggleDisplayByNode(nav);
+      body.style.gridTemplateColumns = nav.style.display === 'none' ? '1fr' : '0fr 1fr';
     }
   }
   #doLoadMainContent() {

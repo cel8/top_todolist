@@ -65,7 +65,8 @@ export class UiTaskController {
         if(this.taskController.edit(taskFormArgs.projectTitle, taskFormArgs.taskTitle, task)) {
           /* Update data */
           taskFormArgs.divTask.querySelector('.task-title').textContent = task.getTitle;
-          taskFormArgs.divTask.querySelector('.task-duedate').textContent = task.getDueDate;
+          taskFormArgs.divTask.querySelector('.task-duedate').textContent = task.getDueDate && task.getDueDate !== '' ? task.getDueDate 
+                                                                                                                      : 'No due date';
           taskFormArgs.divTask.classList.toggle(task.getPriority);
           // Remove previous priority level
           taskFormArgs.divTask.classList.toggle(taskFormArgs.priorityLevel);
@@ -89,11 +90,12 @@ export class UiTaskController {
           activities.push({ id: idx, action: action, done: done });
         }
       });
+      const dueDate = dueDateTask.input.value && dueDateTask.input.value !== '' ? dueDateTask.input.value : undefined;
       // Create a new task
       const task = this.taskController.createTask({
         title: editTextTaskTitle.input.value,
         description: editTextTaskDescr.input.value,
-        dueDate: dueDateTask.input.value,
+        dueDate: dueDate,
         priority: radioBtnPriority.find(item => item.radio.checked === true).radio.value,
         note: editTextTaskNote.input.value,
         list: activities
@@ -189,7 +191,7 @@ export class UiTaskController {
     const divInput          = domManager.createNode('div', 'task-form-container');
     const editTextTaskTitle = inputManager.createEditText('taskTitle', 'Task Title');
     const editTextTaskDescr = inputManager.createEditText('taskDescription', 'Task Description', null, false);
-    const dueDateTask       = inputManager.createDate('taskDueDate', 'Due Date');
+    const dueDateTask       = inputManager.createDate('taskDueDate', 'Due Date', true, false);
     const divPriority       = domManager.createNode('div', 'task-priority');
     const pTaskPriority     = domManager.createNodeContent('p', 'Task Priority');
     const radioBtnPriority  = [];
@@ -294,7 +296,8 @@ export class UiTaskController {
     // Update details
     divMngTaskDetails.querySelector('.task-details-title').textContent       = task.getTitle;
     divMngTaskDetails.querySelector('.task-details-description').textContent = task.getDescription;
-    divMngTaskDetails.querySelector('.task-details-duedate').textContent     = task.getDueDate;
+    divMngTaskDetails.querySelector('.task-details-duedate').textContent     = task.getDueDate && task.getDueDate !== '' ? task.getDueDate 
+                                                                                                                         : 'No due date';
     divMngTaskDetails.querySelector('.task-details-priority').textContent    = task.getPriority;
     divMngTaskDetails.querySelector('.task-details-project').textContent     = projectTitle;
     if(task.getType === taskType.note) {
@@ -350,7 +353,7 @@ export class UiTaskController {
       this.taskController.changeTaskState(taskFormArgs.projectTitle, taskFormArgs.taskTitle, checkBoxDone.input.checked);
     }, task.getDone);
     const pTaskTitle   = domManager.createNodeContent('p', task.getTitle, 'task-title');
-    const pTaskDueDate = domManager.createNodeContent('p', task.dueDate, 'task-duedate');
+    const pTaskDueDate = domManager.createNodeContent('p', task.getDueDate ? task.getDueDate : 'No due date', 'task-duedate');
     taskFormArgs.divTask.classList.toggle(taskFormArgs.priorityLevel);
     // Add node to container
     domManager.addNodeChild(parentContainer, divTask);
@@ -386,7 +389,6 @@ export class UiTaskController {
     const project = this.projectController.find(projectTitle);
     // Load project title and description
     const divProject = domManager.createAddNode('div', main, 'task-project');
-    // TODO: ordering tasks using a button
     const divTaskContainer = domManager.createNode('div', 'task-container');
     const tasks = this.taskController.fetch(projectTitle);
     tasks.forEach(t => this.doAddTaskUI(divTaskContainer, projectTitle, t));
@@ -403,7 +405,7 @@ export class UiTaskController {
     btnAddTask.classList.add('add-task-btn');
     domManager.addNodeChild(main, btnAddTask);
     // Create a sort selector
-    const option = []; // TODO: insert and edit task and order in dom
+    const option = [];
     for (const property in taskSortMode) {
       option.push(taskSortMode[property]);
     }

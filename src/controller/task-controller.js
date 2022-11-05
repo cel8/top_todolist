@@ -61,8 +61,8 @@ export class TaskController {
       case taskSortMode.dueDateAscending:
       case taskSortMode.dueDateDescending:
         tasks.sort((a,b) => { 
-          const aDate = a.getDueDate ? new Date(a.getDueDate) : new Date();
-          const bDate = b.getDueDate ? new Date(b.getDueDate) : new Date();
+          const aDate = (a.getDueDate && a.getDueDate !== '') ? new Date(a.getDueDate) : new Date(2000, 1, 1);
+          const bDate = (b.getDueDate && b.getDueDate !== '') ? new Date(b.getDueDate) : new Date(2000, 1, 1);
           return aDate - bDate; 
         });
         break;

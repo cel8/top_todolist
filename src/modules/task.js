@@ -16,7 +16,7 @@ class Task {
     this.type = undefined;
     this.title = title;
     this.description = description || '';
-    this.dueDate = dueDate || new Date();
+    this.dueDate = dueDate || '';
     this.priority = taskPriority[priority] ? taskPriority[priority] : taskPriority.normal;
     this.done = false;
   }

@@ -2,12 +2,17 @@ import 'Style/style.css';
 import * as domManager from 'Utilities/dom-manager.js';
 import * as btnManager from 'Utilities/button.js';
 import * as inputManager from 'Utilities/input-manager.js';
+import { ProjectController } from 'Controller/project-controller.js';
+import { UiTaskController } from 'View/ui-task-controller.js';
+import { DataSubscriber } from 'Controller/data-subscriber.js';
 import 'Assets/images/svg/plus-circle-outline.svg';
 import 'Assets/images/svg/project.svg';
 import 'Assets/images/svg/pencil-circle.svg';
 import 'Assets/images/svg/delete-circle.svg';
-import { ProjectController } from 'Controller/project-controller.js';
-import { UiTaskController } from 'View/ui-task-controller.js';
+import 'Assets/images/svg/inbox.svg';
+
+const nav = document.querySelector('nav');
+const projectInboxTitle = 'Inbox';
 
 export class UiProjectController {
   #isEdit = false; /* Private edit field */
@@ -49,13 +54,16 @@ export class UiProjectController {
         this.uiTaskController.doEditProjectTitle(prjFormArgs.projectTitle, 
                                                  { title: editTextPrjTitle.input.value, description: editTextPrjDescr.input.value });
         prjFormArgs.projectTitle = editTextPrjTitle.input.value;
-        btnManager.editButtonText(prjFormArgs.projectBtn, prjFormArgs.projectTitle);
+        btnManager.editButtonText(prjFormArgs.divProject.querySelector('button:first-of-type'), prjFormArgs.projectTitle);
+        prjFormArgs.divProject.dataset.title = prjFormArgs.projectTitle;
+        this.projectController.notify(prjFormArgs.projectTitle);
       }
     }
     // Add event
     const cbEventAdd = () => {
-      if(this.projectController.add(editTextPrjTitle.input.value, editTextPrjDescr.input.value)) {     
+      if(this.projectController.add(editTextPrjTitle.input.value, editTextPrjDescr.input.value, new DataSubscriber(this.#doUpdateTaskCompletion))) {     
         this.doAddProjectUI(prjFormArgs.parentContainer, editTextPrjTitle.input.value);
+        this.projectController.notify(editTextPrjTitle.input.value);
       }
     }
     // Submit event
@@ -82,19 +90,41 @@ export class UiProjectController {
       editTextPrjDescr.input.value = project.getDescription;
     }
   }
+  #doUpdateTaskCompletion(data) {
+    const divProject = document.querySelector(`[data-title='${data.project}']`);
+    if(!divProject) return;
+    const divCompletion = divProject.querySelector('.task-completion');
+    if(!divCompletion) return;
+    if(!data.total) {
+      divCompletion.classList.remove('incomplete', 'complete');
+      divCompletion.classList.add('empty');
+      divCompletion.textContent = '0';
+    } else {
+      if(data.complete === data.total) {
+        divCompletion.classList.remove('empty', 'incomplete');
+        divCompletion.classList.add('complete');
+      } else {
+        divCompletion.classList.remove('empty', 'complete');
+        divCompletion.classList.add('incomplete');
+      }
+      divCompletion.textContent = `${data.complete}/${data.total}`;
+    }
+  }
+  #doOpenProject(projectTitle) {
+    // TODO: stop editing #isEdit
+    this.uiTaskController.doLoadProjectTask(projectTitle);
+  }
   doAddProjectUI(parentContainer, projectTitle) {
-    // TODO: implement number of active tasks observer
     const prjFormArgs = {
       isEdit: true,
       projectTitle: projectTitle,
-      projectBtn: null
+      divProject: null
     };
     const nodeProject = domManager.createNodeClass('div', 'project');
     const btnProject = btnManager.createButton(prjFormArgs.projectTitle, 'project.svg', 'project-button', () => {
-      // TODO: stop editing #isEdit
-      this.uiTaskController.doLoadProjectTask(prjFormArgs.projectTitle);
+      this.#doOpenProject(prjFormArgs.projectTitle);
     });
-    prjFormArgs.projectBtn = btnProject;
+    prjFormArgs.divProject = nodeProject;
     domManager.addNodeChild(nodeProject, btnProject);
     domManager.addNodeChild(nodeProject, btnManager.createImageButton('pencil-circle.svg', 'project-button', () => {
       this.#doManageProjectForm(prjFormArgs);
@@ -110,36 +140,52 @@ export class UiProjectController {
       /* Unlock editing */
       this.#toggleEditing();
     }));
+    domManager.createAddNode('div', nodeProject, 'task-completion');
+    prjFormArgs.divProject.dataset.title = prjFormArgs.projectTitle;
     domManager.addNodeChild(parentContainer, nodeProject);
   }
-  doCreateProjectBar() {
+  doLoadProjects() {
     /* Load projects from project controller */
     this.projectController.load();
     /* Create inbox project does not exists */
-    this.projectController.add('Inbox');
+    this.projectController.add(projectInboxTitle);
+  }
+  doCreateInbox() {
+    const nodeProject = domManager.createNodeClass('div', 'project');
+    const btnProject = btnManager.createButton(projectInboxTitle, 'inbox.svg', 'project-button', () => {
+      this.#doOpenProject(projectInboxTitle);
+    });
+    domManager.addNodeChild(nodeProject, btnProject);
+    domManager.createAddNode('div', nodeProject, 'task-completion');
+    nodeProject.dataset.title = projectInboxTitle;
+    domManager.addNodeChild(nav, nodeProject);
+    this.projectController.connect(projectInboxTitle, new DataSubscriber(this.#doUpdateTaskCompletion));
+  }
+  doCreateProjectBar() {
     /* Create project bar */
     const navProjectBar = domManager.createNode('div', 'nav-projects');
     const formAddProject = domManager.createNode('form', 'manage-project-form');
     const divProjectContainer = domManager.createNode('div', 'project-container');
     /* Toggle visibility */
     domManager.toggleDisplayByNode(formAddProject);
-    /* Fetch projects */
-    this.projectController.fetchTitles().forEach(title => {
-      /* Esclude inbox because it has a different management */
-      if(title.toLowerCase() !== 'inbox') {
-        this.doAddProjectUI(divProjectContainer, title);
-      }
-    });
     /* Add project button */
     const btnAddProject = btnManager.createButton('Add project', 'plus-circle-outline.svg', 'project-button', async () => {
       this.#doManageProjectForm({ isEdit: false, parentContainer: divProjectContainer });
     });
     btnAddProject.classList.add('add-project-btn');
     /* Load project to navigation path */
+    domManager.addNodeChild(nav, navProjectBar);
     domManager.addNodeChild(navProjectBar, domManager.createNodeContent('p', 'Projects'));
     domManager.addNodeChild(navProjectBar, btnAddProject);
     domManager.addNodeChild(navProjectBar, formAddProject);
     domManager.addNodeChild(navProjectBar, divProjectContainer);
-    return navProjectBar;
+    /* Fetch projects */
+    this.projectController.fetchTitles().forEach(title => {
+      /* Esclude inbox because it has a different management */
+      if(title.toLowerCase() !== projectInboxTitle.toLowerCase()) {
+        this.doAddProjectUI(divProjectContainer, title);
+        this.projectController.connect(title, new DataSubscriber(this.#doUpdateTaskCompletion));
+      }
+    });
   }
 }

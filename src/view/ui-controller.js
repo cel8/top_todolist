@@ -6,7 +6,6 @@ import 'Assets/images/svg/home-outline.svg';
 import 'Assets/images/svg/calendar-blank.svg';
 import 'Assets/images/svg/github.svg';
 import 'Assets/images/todo-list.gif';
-import 'Assets/images/svg/inbox.svg';
 import 'Assets/images/svg/calendar-today.svg';
 import 'Assets/images/svg/calendar-week.svg';
 import 'Assets/images/svg/calendar-month.svg';
@@ -41,32 +40,26 @@ export class UiController {
     }
   }
   #doLoadMainContent() {
-    const main = document.querySelector('main');
     this.#doCreateNavBar();
-    domManager.addNodeChild(body, main);
   }
   #doCreateNavBar() {
     /* Create navigation bar */
     const nav = document.querySelector('nav');
-    const nodeProjects = this.uiProjectController.doCreateProjectBar();
-    domManager.addNodeChild(nav, btnManager.createButton('Inbox', 'inbox.svg', 'project-button', () => {
-      this.uiTaskController.doLoadProjectTask('Inbox');
-      // TODO: implement number of active tasks
-    }));
+    // Load project from storage
+    this.uiProjectController.doLoadProjects();
+    this.uiProjectController.doCreateInbox();
     // TODO: implement calendar load tasks
-    // TODO: implement number of active tasks
     domManager.addNodeChild(nav, btnManager.createButton('Today', 'calendar-today.svg', 'project-button'));
     domManager.addNodeChild(nav, btnManager.createButton('This week', 'calendar-week.svg', 'project-button'));
     domManager.addNodeChild(nav, btnManager.createButton('This month', 'calendar-month.svg', 'project-button'));
-    domManager.addNodeChild(nav, nodeProjects);
-    domManager.addNodeChild(body, nav);
+    // Create project bar
+    this.uiProjectController.doCreateProjectBar();
   }
   #doLoadFooter() {
     const curYear = new Date().getFullYear();
     const footer = document.querySelector('footer')
     domManager.createAddNode('p', footer, null, null, `Copyright © ${curYear} Alessandro Celotti`);
     domManager.addNodeChild(footer, btnManager.createImageLinkButton('https://github.com/cel8', 'github.svg'));
-    domManager.addNodeChild(body, footer);
   }
   #doLoadOverlay() {
     const overlay = document.querySelector('#overlay');

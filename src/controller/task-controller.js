@@ -1,5 +1,6 @@
 import * as mTask from 'Modules/task.js';
 import { StorageController } from 'Controller/storage-controller.js';
+import { DataPublisher } from './data-publisher.js';
 import { v4 as uuidv4 } from 'uuid';
 
 export const taskSortMode = {
@@ -16,6 +17,8 @@ export const taskSortMode = {
 export class TaskController {
   constructor() {
     this.mapTasks = new Map();
+    this.mapObservers = new Map();
+    this.dataPublisher = new DataPublisher();
     this.storageController = new StorageController('taskTable');
     this.taskPriorityLevel = new Map();
     let level = 0;
@@ -32,15 +35,24 @@ export class TaskController {
   load() {
     this.mapTasks = this.storageController.deserialize();
   }
-  create(projectKey) {
+  create(projectKey, observer = null) {
     if(this.exist(projectKey)) return false;
     this.mapTasks.set(projectKey, []);
+    this.subscribe(projectKey, observer);
+    this.notify(projectKey);
     this.storageController.serialize(this.mapTasks);
+    return true;
+  }
+  connect(projectKey, observer) {
+    if(!this.exist(projectKey)) return false;
+    this.subscribe(projectKey, observer);
+    this.notify(projectKey);
     return true;
   }
   delete(projectKey) {
     if(!this.exist(projectKey)) return false;
     this.mapTasks.delete(projectKey);
+    this.unsubscribe(projectKey);
     this.storageController.serialize(this.mapTasks);
     return true;
   }
@@ -85,10 +97,20 @@ export class TaskController {
     }
     return tasks;
   }
+  fetchTotalTask(projectKey) {
+    return this.fetch(projectKey).length;
+  }
+  fetchTotalUncompletedTask(projectKey) {
+    return this.fetch(projectKey).filter(t => !t.getDone).length;
+  }
+  fetchTotalCompleteTask(projectKey) {
+    return this.fetch(projectKey).filter(t => t.getDone).length;
+  }
   add(projectKey, task) {
     if(!this.exist(projectKey)) return false;
     if(this.#existTask(projectKey, task.getID)) return false;
     this.fetch(projectKey).push(task);
+    this.notify(projectKey);
     this.storageController.serialize(this.mapTasks);
     return true;
   }
@@ -101,6 +123,7 @@ export class TaskController {
     this.mapTasks.set(projectKey, _.filter(tasks, (t => !(id === t.getID))));
     /* Check for serialization */
     if(this.fetch(projectKey).length === nTasks) return false;
+    this.notify(projectKey);
     this.storageController.serialize(this.mapTasks);
     return true;
   }
@@ -109,6 +132,7 @@ export class TaskController {
       return false;
     this.mapTasks.set(projectNewKey, this.mapTasks.get(projectOldKey));
     this.mapTasks.delete(projectOldKey);
+    this.relocateObserver(projectOldKey, projectNewKey);
     this.storageController.serialize(this.mapTasks);
     return true;
   }
@@ -142,6 +166,7 @@ export class TaskController {
   }
   changeTaskState(projectKey, id, state) {
     this.findTask(projectKey, id).setDone = state;
+    this.notify(projectKey);
     this.storageController.serialize(this.mapTasks);
   }
   relocate(oldProjectKey, newProjectKey, oldID, newTask) {
@@ -153,6 +178,8 @@ export class TaskController {
     // Move task in the new project and remove the old one
     this.add(newProjectKey, this.findTask(oldProjectKey, newTask.getID));
     this.remove(oldProjectKey, newTask.getID);
+    this.notify(oldProjectKey);
+    this.notify(newProjectKey);
     this.storageController.serialize(this.mapTasks);
     return true;
   }
@@ -178,6 +205,7 @@ export class TaskController {
         this.fetch(projectKey)[idxOldTask].setCheckList = newTask.getCheckList;
       }
     }
+    this.notify(projectKey);
     this.storageController.serialize(this.mapTasks);
     return true;
   }
@@ -198,5 +226,32 @@ export class TaskController {
     if(!task) return;
     task.remove(activityID);
     this.storageController.serialize(this.mapTasks);
+  }
+  subscribe(projectKey, observer) {
+    if(observer && !this.mapObservers.has(projectKey)) {
+      this.dataPublisher.subscribe(observer);
+      this.mapObservers.set(projectKey, observer);
+    }
+  }
+  unsubscribe(projectKey) {
+    if(this.mapObservers.has(projectKey)) {
+      this.dataPublisher.unsubscribe(this.mapObservers.get(projectKey));
+      this.mapObservers.delete(projectKey);
+    }
+  }
+  notify(projectKey) {
+    if(this.mapObservers.has(projectKey)) {
+      this.dataPublisher.notify(this.mapObservers.get(projectKey), {
+        project: projectKey, 
+        complete: this.fetchTotalCompleteTask(projectKey),
+        total: this.fetchTotalTask(projectKey)
+      });
+    }
+  }
+  relocateObserver(projectOldKey, projectNewKey) {
+    if(this.mapObservers.has(projectOldKey)) {
+      this.mapObservers.set(projectNewKey, this.mapObservers.get(projectOldKey));
+      this.mapObservers.delete(projectOldKey);
+    }
   }
 }

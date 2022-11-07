@@ -20,11 +20,21 @@ export class ProjectController {
     // Load the tasks
     this.taskController.load();
   }
-  add(title, description = '') {
+  add(title, description = '', observer = null) {
     if(this.exist(title)) return false;
-    if(!this.taskController.create(title)) return false;
+    if(!this.taskController.create(title, observer)) return false;
     this.projects.push(new Project(title, description));
     this.storageController.serialize(this.projects);
+    return true;
+  }
+  connect(title, observer) {
+    if(!this.exist(title)) return false;
+    if(!this.taskController.connect(title, observer)) return false;
+    return true;
+  }
+  notify(title) {
+    if(!this.exist(title)) return false;
+    this.taskController.notify(title);
     return true;
   }
   remove(title) {

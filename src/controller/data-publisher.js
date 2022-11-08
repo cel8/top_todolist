@@ -11,7 +11,7 @@ export class DataPublisher {
       this.observers.splice(index, 1);
     }
   }
-  notify(observer, data) {
+  notify(observer, data = null) {
     let index = this.observers.indexOf(observer);
     if(index > -1) {
       this.observers[index].notify(data);

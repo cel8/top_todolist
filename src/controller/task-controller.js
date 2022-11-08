@@ -2,6 +2,7 @@ import * as mTask from 'Modules/task.js';
 import { StorageController } from 'Controller/storage-controller.js';
 import { DataPublisher } from './data-publisher.js';
 import { v4 as uuidv4 } from 'uuid';
+import { compareAsc } from 'date-fns'
 
 export const taskSortMode = {
   addDateAscending:   'Add date ascending',
@@ -22,6 +23,9 @@ export class TaskController {
     this.storageController = new StorageController('taskTable');
     this.taskPriorityLevel = new Map();
     let level = 0;
+    this.expirationTimerNotifier = new DataPublisher();
+    this.expirationTimerObserver = null;
+    this.expirationTimer = -1;
     for (const property in mTask.taskPriority) {
       this.taskPriorityLevel.set(property, level++);
     }
@@ -144,6 +148,7 @@ export class TaskController {
                                                  task.description, 
                                                  task.dueDate, 
                                                  task.priority);
+    this.checkTaskExpired(objTask);
     if(taskType === mTask.taskType.note) {
       objTask.setNote = task.note;
     } else {
@@ -197,6 +202,7 @@ export class TaskController {
       this.fetch(projectKey)[idxOldTask].setTitle = newTask.getTitle;
       this.fetch(projectKey)[idxOldTask].setDescription = newTask.getDescription;
       this.fetch(projectKey)[idxOldTask].setDueDate = newTask.getDueDate;
+      this.fetch(projectKey)[idxOldTask].setExpired = TaskController.getExpired(newTask.getDueDate);
       this.fetch(projectKey)[idxOldTask].setPriority = newTask.getPriority;
       this.fetch(projectKey)[idxOldTask].setDone = oldTask.getDone;
       if(newTask.getType === mTask.taskType.note) {
@@ -253,5 +259,41 @@ export class TaskController {
       this.mapObservers.set(projectNewKey, this.mapObservers.get(projectOldKey));
       this.mapObservers.delete(projectOldKey);
     }
+  }
+  checkExpired(projectKey, id) {
+    const task = this.findTask(projectKey, id);
+    if(!task) return;
+    this.checkTaskExpired(task);
+  }
+  checkTaskExpired(task) {
+    if(!task) return;
+    if(!task.getDueDate || task.getDueDate === '' || task.getDueDate === 'No due date') task.setExpired = false;
+    task.setExpired = compareAsc(new Date(task.getDueDate + "T00:00:00"), new Date()) < 0;
+  }
+  static getExpired(dueDate) {
+    if(!dueDate || dueDate === '' || dueDate === 'No due date') return false;
+    return compareAsc(new Date(dueDate + "T00:00:00"), new Date()) < 0;
+  }
+  installExpirationTimer(notifier, duration = 1440 * 60 * 1000) {
+    if(this.expirationTimer > 0) return;
+    this.expirationTimerObserver = notifier;
+    this.expirationTimerNotifier.subscribe(notifier);
+    // Set interval to verify expired tasks once a day
+    this.expirationTimer = setInterval(() => {
+      let nTasks = 0;
+      this.mapTasks.forEach(tasks => {
+        nTasks += tasks.length;
+        tasks.forEach(t => this.checkExpired(t));
+      });
+      if(!nTasks) return;
+      this.expirationTimerNotifier.notify(this.expirationTimerObserver);
+    }, duration);
+  }
+  uninstallExpirationTimer() {
+    if(this.expirationTimer < 0) return;
+    clearInterval(this.expirationTimer);
+    this.expirationTimerNotifier.unsubscribe(notifier);
+    this.expirationTimerObserver = null;
+    this.expirationTimer = -1;
   }
 }

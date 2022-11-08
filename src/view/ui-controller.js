@@ -24,7 +24,7 @@ export class UiController {
     const header  = document.querySelector('header');
     // TODO: missing some callback handler
     const imgMenu = domManager.createAddNodeImg('menu.svg', 'menu', header, 'icon');
-    const imgHome = domManager.createAddNodeImg('home-outline.svg', 'home', header, 'icon');
+    const imgHome = domManager.createAddNodeImg('home-outline.svg', 'home', header, 'icon'); // TODO: clear main
     domManager.createAddNodeImg('todo-list.gif', 'todo-list', header, 'icon');
     domManager.createAddNode('p', header, 'main-text', null, 'Task list');
     domManager.createAddNodeImg('calendar-blank.svg', 'today', header, 'icon');

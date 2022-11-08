@@ -17,6 +17,7 @@ class Task {
     this.title = title;
     this.description = description || '';
     this.dueDate = dueDate || '';
+    this.expired = false;
     this.priority = taskPriority[priority] ? taskPriority[priority] : taskPriority.normal;
     this.done = false;
   }
@@ -55,6 +56,11 @@ class Task {
    */
   set setDone(state) { this.done = state ? true : false; }
   get getDone() { return this.done; }
+  /**
+   * @param {boolean} expired
+   */
+  set setExpired(expired) { this.expired = expired ? true : false; }
+  get getExpired() { return this.expired; }
 }
 
 export class TaskNote extends Task {

@@ -6,6 +6,8 @@ import * as inputManager from 'Utilities/input-manager.js';
 import { taskPriority, taskType } from 'Modules/task.js';
 import 'Assets/images/svg/close-circle.svg';
 import _ from 'lodash';
+import { compareAsc } from 'date-fns'
+import { DataSubscriber } from 'Controller/data-subscriber';
 
 const overlay = document.querySelector('#overlay');
 const main = document.querySelector('main');
@@ -14,6 +16,7 @@ export class UiTaskController {
   constructor() {
     this.projectController = ProjectController.getInstance();
     this.taskController = TaskController.getInstance();
+    this.taskController.setExpirationTimerCb = this.doUpdateExpirationTasks;
     this.currentSortMode = taskSortMode.addDateAscending;
   }
   static getInstance() {
@@ -69,6 +72,7 @@ export class UiTaskController {
           taskFormArgs.divTask.querySelector('.task-title').textContent = task.getTitle;
           taskFormArgs.divTask.querySelector('.task-duedate').textContent = task.getDueDate && task.getDueDate !== '' ? task.getDueDate 
                                                                                                                       : 'No due date';
+          this.doExpireTask(taskFormArgs.divTask, task.getExpired);
           taskFormArgs.divTask.classList.toggle(task.getPriority);
           // Remove previous priority level
           taskFormArgs.divTask.classList.toggle(taskFormArgs.priorityLevel);
@@ -76,6 +80,7 @@ export class UiTaskController {
           taskFormArgs.taskTitle = editTextTaskTitle.input.value;
           taskFormArgs.taskID = task.getID;
           taskFormArgs.priorityLevel = task.getPriority;
+          taskFormArgs.expired = task.getExpired;
         }
       }
     };
@@ -342,6 +347,28 @@ export class UiTaskController {
       }
     };
   }
+  #doUpdateExpirationTasks() {
+    const divTaskContainer = document.querySelector('.task-container');
+    if(!divTaskContainer) return;
+    const pTitleProject = document.querySelector('.task-project > p:first-of-type');
+    if(!pTitleProject) return;
+    Array.from(divTaskContainer.children).forEach(t => {
+      if(TaskController.getInstance().findTask(pTitleProject.textContent, t.dataset.id).getExpired) {
+        t.classList.add('expired');
+      } else {
+        t.classList.remove('expired');
+      }
+    });
+  } 
+  doExpireTask(divTask, expired) {
+    const pDueDate = divTask.querySelector('.task-duedate');
+    if(!pDueDate) return;
+    if(expired) {
+      divTask.classList.add('expired');
+    } else {
+      divTask.classList.remove('expired');
+    }
+  }
   doAddTaskUI(parentContainer, projectTitle, task) {
     const divTask = domManager.createNode('div', 'task-item');
     const taskFormArgs = {
@@ -350,6 +377,7 @@ export class UiTaskController {
       taskID: task.getID,
       taskTitle: task.getTitle,
       priorityLevel: task.getPriority,
+      expired: task.getExpired,
       divTask: divTask,
       parentContainer: parentContainer
     };
@@ -365,6 +393,7 @@ export class UiTaskController {
     domManager.addNodeChild(divTask, checkBoxDone.input);
     domManager.addNodeChild(divTask, pTaskTitle);
     domManager.addNodeChild(divTask, pTaskDueDate);
+    this.doExpireTask(taskFormArgs.divTask, taskFormArgs.expired);
     domManager.addNodeChild(divTask, btnManager.createTextButton('details', 'task-button details', () => {
       this.#doOpenTaskDetails(taskFormArgs.projectTitle, taskFormArgs.taskID);
     }));
@@ -397,6 +426,8 @@ export class UiTaskController {
     // Check if project is currently onscreen
     const pTitleProject = document.querySelector('.task-project > p:first-of-type');
     if(pTitleProject && pTitleProject.textContent === projectTitle) {
+      // Uninstall expiration timer
+      this.taskController.uninstallExpirationTimer();
       // Remove main content
       domManager.removeAllChildNodes(main);
     }
@@ -440,5 +471,7 @@ export class UiTaskController {
     domManager.addNodeChild(main, selectSortType.label);
     domManager.addNodeChild(main, selectSortType.input);
     domManager.addNodeChild(main, divTaskContainer);
+    // Install expiration timer
+    this.taskController.installExpirationTimer(new DataSubscriber(this.#doUpdateExpirationTasks));
   }
 }

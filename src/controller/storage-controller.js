@@ -1,5 +1,6 @@
 import { Project } from 'Modules/project';
 import { TaskFactory, taskType } from 'Modules/task.js';
+import { TaskController } from 'Controller/task-controller.js';
 
 export const storageTable = {
   projectTable: 'localTodoList',
@@ -27,6 +28,7 @@ export class StorageController {
             // Create a new task for map
             const task = TaskFactory.createTask(v.type, v.id, v.title, v.description, v.dueDate, v.priority);
             task.setDone = v.done;
+            task.setExpired = TaskController.getExpired(task.getDueDate);
             if(taskType.note === taskType[v.type]) {
               task.setNote = v.note;
             } else {

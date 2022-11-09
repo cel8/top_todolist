@@ -46,10 +46,19 @@ export class UiController {
     // Load project from storage
     this.uiProjectController.doLoadProjects();
     this.uiProjectController.doCreateInbox();
-    // TODO: implement calendar load tasks
-    domManager.addNodeChild(nav, btnManager.createButton('Today', 'calendar-today.svg', 'project-button'));
-    domManager.addNodeChild(nav, btnManager.createButton('This week', 'calendar-week.svg', 'project-button'));
-    domManager.addNodeChild(nav, btnManager.createButton('This month', 'calendar-month.svg', 'project-button'));
+    // TODO: implement task UI loading of calendar task items
+    domManager.addNodeChild(nav, btnManager.createButton('Today', 'calendar-today.svg', 'project-button', () => {
+      console.log("today: ");
+      console.log(this.uiTaskController.taskController.fetchByDueDate('today'));
+    }));
+    domManager.addNodeChild(nav, btnManager.createButton('This week', 'calendar-week.svg', 'project-button', () => {
+      console.log("week: ");
+      console.log(this.uiTaskController.taskController.fetchByDueDate('week'));
+    }));
+    domManager.addNodeChild(nav, btnManager.createButton('This month', 'calendar-month.svg', 'project-button', () => {
+      console.log("month: ");
+      console.log(this.uiTaskController.taskController.fetchByDueDate('month'));
+    }));
     // Create project bar
     this.uiProjectController.doCreateProjectBar();
   }

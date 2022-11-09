@@ -2,7 +2,7 @@ import * as mTask from 'Modules/task.js';
 import { StorageController } from 'Controller/storage-controller.js';
 import { DataPublisher } from './data-publisher.js';
 import { v4 as uuidv4 } from 'uuid';
-import { compareAsc, format } from 'date-fns'
+import { compareAsc, format, isWithinInterval, isToday, startOfWeek, endOfWeek, startOfMonth, endOfMonth } from 'date-fns'
 
 export const taskSortMode = {
   addDateAscending:   'Add date ascending',
@@ -14,6 +14,12 @@ export const taskSortMode = {
   priorityAscending:  'Priority ascending',
   priorityDescending: 'Priority descending'
 };
+
+export const taskFetchDate = {
+  today: 'Today',
+  week:  'This week',
+  month: 'This month'
+}
 
 export class TaskController {
   constructor() {
@@ -109,6 +115,38 @@ export class TaskController {
   }
   fetchTotalCompleteTask(projectKey) {
     return this.fetch(projectKey).filter(t => t.getDone).length;
+  }
+  fetchByDueDate(mode) {
+    const projects = new Map();
+    const now = new Date(format(new Date(), 'yyyy-MM-dd') + "T00:00:00");
+    this.mapTasks.forEach((tasks, project) => {
+      tasks.forEach(task => {
+        let save = false;    
+        if(!task.getDueDate || task.getDueDate === '' || task.getDueDate === 'No due date') return;
+        switch(taskFetchDate[mode]) {
+          case taskFetchDate.week:
+            save = isWithinInterval(new Date(task.getDueDate + "T00:00:00"), {
+              start: startOfWeek(now),
+              end: endOfWeek(now)
+            });
+            break;
+          case taskFetchDate.month:
+            save = isWithinInterval(new Date(task.getDueDate + "T00:00:00"), {
+              start: startOfMonth(now),
+              end: endOfMonth(now)
+            });
+            break;
+          case taskFetchDate.today:
+          default:
+            save = isToday(new Date(task.getDueDate + "T00:00:00"));
+            break;
+        }
+        if(!save) return;
+        if(!projects.has(project)) projects.set(project, []);
+        projects.get(project).push(task);
+      });
+    });
+    return projects;
   }
   add(projectKey, task) {
     if(!this.exist(projectKey)) return false;

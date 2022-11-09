@@ -2,7 +2,7 @@ import * as mTask from 'Modules/task.js';
 import { StorageController } from 'Controller/storage-controller.js';
 import { DataPublisher } from './data-publisher.js';
 import { v4 as uuidv4 } from 'uuid';
-import { compareAsc } from 'date-fns'
+import { compareAsc, format } from 'date-fns'
 
 export const taskSortMode = {
   addDateAscending:   'Add date ascending',
@@ -268,11 +268,11 @@ export class TaskController {
   checkTaskExpired(task) {
     if(!task) return;
     if(!task.getDueDate || task.getDueDate === '' || task.getDueDate === 'No due date') task.setExpired = false;
-    task.setExpired = compareAsc(new Date(task.getDueDate + "T00:00:00"), new Date()) < 0;
+    task.setExpired = compareAsc(new Date(task.getDueDate + "T00:00:00"), new Date(format(new Date(), 'yyyy-MM-dd') + "T00:00:00")) < 0;
   }
   static getExpired(dueDate) {
     if(!dueDate || dueDate === '' || dueDate === 'No due date') return false;
-    return compareAsc(new Date(dueDate + "T00:00:00"), new Date()) < 0;
+    return compareAsc(new Date(dueDate + "T00:00:00"), new Date(format(new Date(), 'yyyy-MM-dd') + "T00:00:00")) < 0;
   }
   installExpirationTimer(notifier, duration = 1440 * 60 * 1000) {
     if(this.expirationTimer > 0) return;

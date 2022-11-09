@@ -304,8 +304,14 @@ export class UiTaskController {
     // Update details
     divMngTaskDetails.querySelector('.task-details-title').textContent       = task.getTitle;
     divMngTaskDetails.querySelector('.task-details-description').textContent = task.getDescription;
-    divMngTaskDetails.querySelector('.task-details-duedate').textContent     = task.getDueDate && task.getDueDate !== '' ? task.getDueDate 
+    const taskDueDate = divMngTaskDetails.querySelector('.task-details-duedate');
+    taskDueDate.textContent                                                  = task.getDueDate && task.getDueDate !== '' ? task.getDueDate 
                                                                                                                          : 'No due date';
+    if(task.getExpired) {
+      taskDueDate.classList.add('expired');
+    } else {
+      taskDueDate.classList.remove('expired');
+    }
     divMngTaskDetails.querySelector('.task-details-priority').textContent    = task.getPriority;
     divMngTaskDetails.querySelector('.task-details-project').textContent     = projectTitle;
     if(task.getType === taskType.note) {

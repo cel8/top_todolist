@@ -294,7 +294,7 @@ export class TaskController {
   uninstallExpirationTimer() {
     if(this.expirationTimer < 0) return;
     clearInterval(this.expirationTimer);
-    this.expirationTimerNotifier.unsubscribe(notifier);
+    this.expirationTimerNotifier.unsubscribe(this.expirationTimerObserver);
     this.expirationTimerObserver = null;
     this.expirationTimer = -1;
   }

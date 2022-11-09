@@ -3,7 +3,6 @@ import * as domManager from 'Utilities/dom-manager.js';
 import * as btnManager from 'Utilities/button.js';
 import 'Assets/images/svg/menu.svg';
 import 'Assets/images/svg/home-outline.svg';
-import 'Assets/images/svg/calendar-blank.svg';
 import 'Assets/images/svg/github.svg';
 import 'Assets/images/todo-list.gif';
 import 'Assets/images/svg/calendar-today.svg';
@@ -22,22 +21,21 @@ export class UiController {
   }
   #doLoadHeader() {
     const header  = document.querySelector('header');
-    // TODO: missing some callback handler
-    const imgMenu = domManager.createAddNodeImg('menu.svg', 'menu', header, 'icon');
-    const imgHome = domManager.createAddNodeImg('home-outline.svg', 'home', header, 'icon'); // TODO: clear main
-    domManager.createAddNodeImg('todo-list.gif', 'todo-list', header, 'icon');
-    domManager.createAddNode('p', header, 'main-text', null, 'Task list');
-    domManager.createAddNodeImg('calendar-blank.svg', 'today', header, 'icon');
-    domManager.addNodeChild(header, btnManager.createButton('Create task', 'plus-circle-outline.svg', 'project-button', () => {
-      this.uiTaskController.doCreateTask();
-    }));
-    domManager.addNodeChild(body, header);
-    imgMenu.onclick = async () => {
+    domManager.addNodeChild(header, btnManager.createImageButton('menu.svg', 'header-button', async () => {
       await setTimeout(250);
       const nav = document.querySelector('nav');
       domManager.toggleDisplayByNode(nav);
       body.style.gridTemplateColumns = nav.style.display === 'none' ? '1fr' : '0fr 1fr';
-    }
+    }));
+    domManager.addNodeChild(header, btnManager.createImageButton('home-outline.svg', 'header-button', () => {
+      this.uiTaskController.doRemoveProject();
+    }));
+    domManager.createAddNodeImg('todo-list.gif', 'todo-list', header, 'icon');
+    domManager.createAddNode('p', header, 'main-text', null, 'Task list');
+    domManager.addNodeChild(header, btnManager.createButton('Create task', 'plus-circle-outline.svg', 'header-button', () => {
+      this.uiTaskController.doCreateTask();
+    }));
+    domManager.addNodeChild(body, header);
   }
   #doLoadMainContent() {
     this.#doCreateNavBar();

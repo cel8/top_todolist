@@ -418,10 +418,10 @@ export class UiTaskController {
       document.querySelector('.task-project > p:last-of-type').textContent = project.description;
     }
   }
-  doRemoveProject(projectTitle) {
+  doRemoveProject(projectTitle = undefined) {
     // Check if project is currently onscreen
     const pTitleProject = document.querySelector('.task-project > p:first-of-type');
-    if(pTitleProject && pTitleProject.textContent === projectTitle) {
+    if(pTitleProject && (!projectTitle || pTitleProject.textContent === projectTitle)) {
       // Uninstall expiration timer
       this.taskController.uninstallExpirationTimer();
       // Remove main content

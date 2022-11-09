@@ -123,6 +123,22 @@ header {
   grid-column-end: span 2;
 }
 
+.header-button {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  border: none;
+  background-color: white;
+}
+
+.header-button > p {
+  font-weight: bold;
+}
+
+.header-button > img {
+  width: 2.5rem;
+}
+
 /* Main content */
 
 main {

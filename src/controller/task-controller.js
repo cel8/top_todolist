@@ -280,13 +280,15 @@ export class TaskController {
     this.expirationTimerNotifier.subscribe(notifier);
     // Set interval to verify expired tasks once a day
     this.expirationTimer = setInterval(() => {
-      let nTasks = 0;
-      this.mapTasks.forEach(tasks => {
-        nTasks += tasks.length;
-        tasks.forEach(t => this.checkExpired(t));
+      this.mapTasks.forEach((tasks, project) => {
+        tasks.forEach(t => {
+          const isExpired = t.getExpired;
+          this.checkTaskExpired(t);
+          if(isExpired !== t.getExpired) {
+            this.expirationTimerNotifier.notify(this.expirationTimerObserver, { project: project, task: t });
+          }
+        });
       });
-      if(!nTasks) return;
-      this.expirationTimerNotifier.notify(this.expirationTimerObserver);
     }, duration);
   }
   uninstallExpirationTimer() {

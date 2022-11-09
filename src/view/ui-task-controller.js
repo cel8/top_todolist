@@ -72,7 +72,7 @@ export class UiTaskController {
           taskFormArgs.divTask.querySelector('.task-title').textContent = task.getTitle;
           taskFormArgs.divTask.querySelector('.task-duedate').textContent = task.getDueDate && task.getDueDate !== '' ? task.getDueDate 
                                                                                                                       : 'No due date';
-          this.doExpireTask(taskFormArgs.divTask, task.getExpired);
+          UiTaskController.#doExpireTask(taskFormArgs.divTask, task.getExpired);
           taskFormArgs.divTask.classList.toggle(task.getPriority);
           // Remove previous priority level
           taskFormArgs.divTask.classList.toggle(taskFormArgs.priorityLevel);
@@ -347,20 +347,16 @@ export class UiTaskController {
       }
     };
   }
-  #doUpdateExpirationTasks() {
+  #doUpdateExpirationTasks(data) {
     const divTaskContainer = document.querySelector('.task-container');
     if(!divTaskContainer) return;
     const pTitleProject = document.querySelector('.task-project > p:first-of-type');
-    if(!pTitleProject) return;
-    Array.from(divTaskContainer.children).forEach(t => {
-      if(TaskController.getInstance().findTask(pTitleProject.textContent, t.dataset.id).getExpired) {
-        t.classList.add('expired');
-      } else {
-        t.classList.remove('expired');
-      }
-    });
+    if(!pTitleProject || (pTitleProject.textContent !== data.project)) return;
+    const divTask = divTaskContainer.querySelector(`.task-item[data-id='${data.task.getID}']`);
+    if(!divTask) return;
+    UiTaskController.#doExpireTask(divTask, data.task.getExpired);
   } 
-  doExpireTask(divTask, expired) {
+  static #doExpireTask(divTask, expired) {
     const pDueDate = divTask.querySelector('.task-duedate');
     if(!pDueDate) return;
     if(expired) {
@@ -393,7 +389,7 @@ export class UiTaskController {
     domManager.addNodeChild(divTask, checkBoxDone.input);
     domManager.addNodeChild(divTask, pTaskTitle);
     domManager.addNodeChild(divTask, pTaskDueDate);
-    this.doExpireTask(taskFormArgs.divTask, taskFormArgs.expired);
+    UiTaskController.#doExpireTask(taskFormArgs.divTask, taskFormArgs.expired);
     domManager.addNodeChild(divTask, btnManager.createTextButton('details', 'task-button details', () => {
       this.#doOpenTaskDetails(taskFormArgs.projectTitle, taskFormArgs.taskID);
     }));

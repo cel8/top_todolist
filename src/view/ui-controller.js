@@ -11,6 +11,7 @@ import 'Assets/images/svg/calendar-month.svg';
 import { setTimeout } from 'timers-promises';
 import { UiProjectController } from 'View/ui-project-controller';
 import { UiTaskController } from 'View/ui-task-controller.js';
+import { taskFetchDate } from 'Controller/task-controller.js';
 
 const body = document.querySelector('body');
 
@@ -46,18 +47,14 @@ export class UiController {
     // Load project from storage
     this.uiProjectController.doLoadProjects();
     this.uiProjectController.doCreateInbox();
-    // TODO: implement task UI loading of calendar task items
     domManager.addNodeChild(nav, btnManager.createButton('Today', 'calendar-today.svg', 'project-button', () => {
-      console.log("today: ");
-      console.log(this.uiTaskController.taskController.fetchByDueDate('today'));
+      this.uiTaskController.doLoadTasksByDueDate(taskFetchDate.today);
     }));
     domManager.addNodeChild(nav, btnManager.createButton('This week', 'calendar-week.svg', 'project-button', () => {
-      console.log("week: ");
-      console.log(this.uiTaskController.taskController.fetchByDueDate('week'));
+      this.uiTaskController.doLoadTasksByDueDate(taskFetchDate.week);
     }));
     domManager.addNodeChild(nav, btnManager.createButton('This month', 'calendar-month.svg', 'project-button', () => {
-      console.log("month: ");
-      console.log(this.uiTaskController.taskController.fetchByDueDate('month'));
+      this.uiTaskController.doLoadTasksByDueDate(taskFetchDate.month);
     }));
     // Create project bar
     this.uiProjectController.doCreateProjectBar();

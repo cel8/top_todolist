@@ -18,6 +18,7 @@ export class UiTaskController {
     this.taskController = TaskController.getInstance();
     this.taskController.setExpirationTimerCb = this.doUpdateExpirationTasks;
     this.currentSortMode = taskSortMode.addDateAscending;
+    this.dueDateView = { active: false, mode: undefined };
   }
   static getInstance() {
     if(!this.instance) {
@@ -44,7 +45,7 @@ export class UiTaskController {
       const projectTitle = taskFormArgs.projectTitle ? taskFormArgs.projectTitle
                                                      : selectProject.input.value;
       // Add the new task to project 
-      if(this.taskController.add(projectTitle, task) && taskFormArgs.projectTitle) {
+      if(this.taskController.add(projectTitle, task) && ((taskFormArgs.projectTitle) || (this.dueDateView.active))) {
         this.doAddTaskUI(taskFormArgs.parentContainer, projectTitle, task);
       }
     };
@@ -56,6 +57,7 @@ export class UiTaskController {
                                         selectProject.input.value, 
                                         taskFormArgs.taskID, 
                                         task)) {
+          const oldProjectKey = taskFormArgs.projectTitle;
           /* Update data */
           taskFormArgs.projectTitle = selectProject.input.value;
           taskFormArgs.taskTitle = editTextTaskTitle.input.value;
@@ -63,10 +65,21 @@ export class UiTaskController {
           taskFormArgs.priorityLevel = task.getPriority;
           // Remove div from content
           taskFormArgs.divTask.remove();
+          if(this.dueDateView.active) {
+            this.doRemoveDueDateProjectTask(oldProjectKey);
+            if(this.taskController.checkDueDateInterval(task, this.dueDateView.mode)) {
+              this.doAddTaskUI(this.doAddDueDateProjectTask(selectProject.input.value), taskFormArgs.projectTitle, task);
+            }
+          }
         }
       } else { 
         // Edit task
         if(this.taskController.edit(taskFormArgs.projectTitle, taskFormArgs.taskID, task)) {
+          if(this.dueDateView.active && !this.taskController.checkDueDateInterval(task, this.dueDateView.mode)) {
+            taskFormArgs.divTask.remove();
+            this.doRemoveDueDateProjectTask(taskFormArgs.projectTitle);
+            return;
+          }
           /* Update data */
           taskFormArgs.divTask.dataset.id = task.getID;
           taskFormArgs.divTask.querySelector('.task-title').textContent = task.getTitle;
@@ -91,7 +104,15 @@ export class UiTaskController {
     const cbEventSubmit = (e) => {
       e.preventDefault();
       // Fill parent and project title for each case      
-      const parentContainer = !taskFormArgs.parentContainer ? document.querySelector('.task-container') : taskFormArgs.parentContainer;
+      let parentContainer = taskFormArgs.parentContainer;
+      if(!parentContainer) {
+        if(this.dueDateView.active) {
+          parentContainer = this.doAddDueDateProjectTask(selectProject.input.value);
+          taskFormArgs.parentContainer = parentContainer;
+        } else {
+          parentContainer = document.querySelector('.task-container')
+        }
+      }
       let projectTitle = taskFormArgs.projectTitle;
       if(!taskFormArgs.projectTitle) {
         const pTitle = document.querySelector('.task-project > p:first-of-type');
@@ -117,7 +138,8 @@ export class UiTaskController {
       });
       taskFormArgs.isEdit ? cbEventEdit(task) : cbEventAdd(task);
       // Sort in DOM during add or edit (no relocate)
-      if((parentContainer) && 
+      if((!this.dueDateView.active) &&
+         (parentContainer) && 
          (projectTitle === selectProject.input.value)) {
         this.doReloadSorted(projectTitle, parentContainer, this.currentSortMode);
       }
@@ -307,7 +329,7 @@ export class UiTaskController {
     const taskDueDate = divMngTaskDetails.querySelector('.task-details-duedate');
     taskDueDate.textContent                                                  = task.getDueDate && task.getDueDate !== '' ? task.getDueDate 
                                                                                                                          : 'No due date';
-    if(task.getExpired) {
+    if(task.getExpired) { // TODO: should take care about task completation (when done and expired => done must survive)
       taskDueDate.classList.add('expired');
     } else {
       taskDueDate.classList.remove('expired');
@@ -405,6 +427,7 @@ export class UiTaskController {
     domManager.addNodeChild(divTask, btnManager.createImageButton('delete-circle.svg', 'task-button', () => {
       if(this.taskController.remove(taskFormArgs.projectTitle, taskFormArgs.taskID)) {
         divTask.remove();
+        this.doRemoveDueDateProjectTask(taskFormArgs.projectTitle);
       }
     }));
   }
@@ -417,24 +440,43 @@ export class UiTaskController {
     tasks.forEach(t => this.doAddTaskUI(parentContainer, projectTitle, t));
   }
   doEditProjectTitle(oldProjectTitle, project) {
+    const queryTag = this.dueDateView.active ? `.duedate-task-project[data-project-title='${oldProjectTitle}'] > p:first-of-type`
+                                             : '.task-project > p:first-of-type';
     // Check if project is currently onscreen
-    const pTitleProject = document.querySelector('.task-project > p:first-of-type');
+    const pTitleProject = document.querySelector(queryTag);
     if(pTitleProject && pTitleProject.textContent === oldProjectTitle) {
       pTitleProject.textContent = project.title;
-      document.querySelector('.task-project > p:last-of-type').textContent = project.description;
+      if(this.dueDateView.active) {
+        pTitleProject.parentElement.dataset.projectTitle = project.title;
+      } else {
+        document.querySelector('.task-project > p:last-of-type').textContent = project.description;
+      }
     }
   }
   doRemoveProject(projectTitle = undefined) {
     // Check if project is currently onscreen
-    const pTitleProject = document.querySelector('.task-project > p:first-of-type');
-    if(pTitleProject && (!projectTitle || pTitleProject.textContent === projectTitle)) {
-      // Uninstall expiration timer
-      this.taskController.uninstallExpirationTimer();
-      // Remove main content
-      domManager.removeAllChildNodes(main);
+    const queryTag = (this.dueDateView.active && projectTitle) ? `.duedate-task-project[data-project-title='${projectTitle}'] > p:first-of-type`
+                                                               : '.task-project > p:first-of-type';
+    const pTitleProject = document.querySelector(queryTag);
+    if(!projectTitle || pTitleProject.textContent === projectTitle) {
+      if(this.dueDateView.active && projectTitle) {
+        // Remove project
+        pTitleProject.parentElement.remove();
+      } else {
+        // Uninstall expiration timer
+        this.taskController.uninstallExpirationTimer();
+        // Remove main content
+        domManager.removeAllChildNodes(main);
+        // Disable due date mode
+        this.dueDateView.active = false;
+        this.dueDateView.mode = undefined;
+      }
     }
   }
   doLoadProjectTask(projectTitle) {
+    // Disable due date mode
+    this.dueDateView.active = false;
+    this.dueDateView.mode = undefined;
     // Initialize the current sort mode
     this.currentSortMode = taskSortMode.addDateAscending;
     // Remove main content
@@ -475,5 +517,48 @@ export class UiTaskController {
     domManager.addNodeChild(main, divTaskContainer);
     // Install expiration timer
     this.taskController.installExpirationTimer(new DataSubscriber(this.#doUpdateExpirationTasks));
+  }
+  doRemoveDueDateProjectTask(project) {
+    if(!this.dueDateView.active) return;
+    const divProjectContainer = main.querySelector('.duedate-project-container');
+    const divProject = divProjectContainer.querySelector(`.duedate-task-project[data-project-title='${project}']`);
+    if(!divProject) return;
+    if(!divProject.querySelector('.duedate-task-container').children.length) divProject.remove();
+  }
+  doAddDueDateProjectTask(project) {
+    let divTaskContainer = null;
+    if(!this.dueDateView.active) return divTaskContainer;
+    const divProjectContainer = main.querySelector('.duedate-project-container');
+    const divProject = divProjectContainer.querySelector(`.duedate-task-project[data-project-title='${project}']`);
+    if(!divProject) {
+      const divProject = domManager.createAddNode('div', divProjectContainer, 'duedate-task-project');
+      divProject.dataset.projectTitle = project;
+      domManager.addNodeChild(divProject, domManager.createNodeContent('p', project));
+      divTaskContainer = domManager.createAddNode('div', divProject, 'duedate-task-container');
+    } else {
+      divTaskContainer = divProject.querySelector('.duedate-task-container');
+    }
+    return divTaskContainer;
+  }
+  doLoadTasksByDueDate(mode) {
+    // Disable due date mode
+    this.dueDateView.active = true;
+    this.dueDateView.mode = mode;
+    // Uninstall expiration timer
+    this.taskController.uninstallExpirationTimer();
+    // Remove main content
+    domManager.removeAllChildNodes(main);
+    // Fetch by due date
+    const mapTasks = this.taskController.fetchByDueDate(mode);
+    // Create a project container
+    const divProjectContainer = domManager.createAddNode('div', main, 'duedate-project-container');
+    // Loop on projects
+    mapTasks.forEach((tasks, project) => {
+      const divProject = domManager.createAddNode('div', divProjectContainer, 'duedate-task-project');
+      divProject.dataset.projectTitle = project;
+      domManager.addNodeChild(divProject, domManager.createNodeContent('p', project));
+      const divTaskContainer = domManager.createAddNode('div', divProject, 'duedate-task-container');
+      tasks.forEach(t => this.doAddTaskUI(divTaskContainer, project, t));
+    });
   }
 }

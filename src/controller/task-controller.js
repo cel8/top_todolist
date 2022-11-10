@@ -16,9 +16,9 @@ export const taskSortMode = {
 };
 
 export const taskFetchDate = {
-  today: 'Today',
-  week:  'This week',
-  month: 'This month'
+  today: 'today',
+  week:  'week',
+  month: 'month'
 }
 
 export class TaskController {
@@ -116,32 +116,35 @@ export class TaskController {
   fetchTotalCompleteTask(projectKey) {
     return this.fetch(projectKey).filter(t => t.getDone).length;
   }
+  checkDueDateInterval(task, mode, now = new Date(format(new Date(), 'yyyy-MM-dd') + "T00:00:00")) {
+    let isContained = false;
+    if(!task.getDueDate || task.getDueDate === '' || task.getDueDate === 'No due date') return false;
+    switch(taskFetchDate[mode]) {
+      case taskFetchDate.week:
+        isContained = isWithinInterval(new Date(task.getDueDate + "T00:00:00"), {
+          start: startOfWeek(now),
+          end: endOfWeek(now)
+        });
+        break;
+      case taskFetchDate.month:
+        isContained = isWithinInterval(new Date(task.getDueDate + "T00:00:00"), {
+          start: startOfMonth(now),
+          end: endOfMonth(now)
+        });
+        break;
+      case taskFetchDate.today:
+      default:
+        isContained = isToday(new Date(task.getDueDate + "T00:00:00"));
+        break;
+    }
+    return isContained;
+  }
   fetchByDueDate(mode) {
     const projects = new Map();
     const now = new Date(format(new Date(), 'yyyy-MM-dd') + "T00:00:00");
     this.mapTasks.forEach((tasks, project) => {
       tasks.forEach(task => {
-        let save = false;    
-        if(!task.getDueDate || task.getDueDate === '' || task.getDueDate === 'No due date') return;
-        switch(taskFetchDate[mode]) {
-          case taskFetchDate.week:
-            save = isWithinInterval(new Date(task.getDueDate + "T00:00:00"), {
-              start: startOfWeek(now),
-              end: endOfWeek(now)
-            });
-            break;
-          case taskFetchDate.month:
-            save = isWithinInterval(new Date(task.getDueDate + "T00:00:00"), {
-              start: startOfMonth(now),
-              end: endOfMonth(now)
-            });
-            break;
-          case taskFetchDate.today:
-          default:
-            save = isToday(new Date(task.getDueDate + "T00:00:00"));
-            break;
-        }
-        if(!save) return;
+        if(!this.checkDueDateInterval(task, mode, now)) return;
         if(!projects.has(project)) projects.set(project, []);
         projects.get(project).push(task);
       });

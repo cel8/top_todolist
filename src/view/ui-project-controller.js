@@ -79,21 +79,35 @@ export class UiProjectController {
         this.projectController.notify(editTextPrjTitle.input.value);
       }
     }
+    const cbValidation = () => {
+      const title = editTextPrjTitle.input.value;
+      if((!prjFormArgs.isEdit && this.projectController.exist(title)) ||
+         ( prjFormArgs.isEdit && ((project.title !== title) && this.projectController.exist(title)))) {
+        editTextPrjTitle.input.classList.add('invalid');
+        divPrjTitleAlrt.textContent = 'Project already exists.';
+        return false;
+      }
+      divPrjTitleAlrt.textContent = '';
+      editTextPrjTitle.input.classList.remove('invalid');
+      return true;
+    }
     // Submit event
-    // TODO: need to implement form validation
     const cbEventSubmit = (e) => {
       e.preventDefault();
+      if(!cbValidation()) return;
       prjFormArgs.isEdit ? cbEventEdit() : cbEventAdd();
       cbFinalizeForm();
     };
     /* Add input */
     const editTextPrjTitle = inputManager.createEditText('prjTitle', 'Project title:', 'Project name');
+    const divPrjTitleAlrt  = domManager.createNode('div', 'input-validation');
     const editTextPrjDescr = inputManager.createEditText('prjDescription', 'Project description:', 'Project description', false);
     const btnCancel        = inputManager.createTextButton('btnCancel', 'Cancel', 'form-project-button', cbEventCancel);
     const btnSubmit        = inputManager.createTextButton('btnSubmit', 'Submit', 'form-project-button', cbEventSubmit, formMngProject);
     const divCompleteBtn   = domManager.createNode('div', 'complete-button');
     domManager.addNodeChild(formMngProject, editTextPrjTitle.label);
     domManager.addNodeChild(formMngProject, editTextPrjTitle.input);
+    domManager.addNodeChild(formMngProject, divPrjTitleAlrt);
     domManager.addNodeChild(formMngProject, editTextPrjDescr.label);
     domManager.addNodeChild(formMngProject, editTextPrjDescr.input);
     domManager.addNodeChild(formMngProject, divCompleteBtn);

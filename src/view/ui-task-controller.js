@@ -13,6 +13,7 @@ import { DataSubscriber } from 'Controller/data-subscriber';
 const overlay = document.querySelector('#overlay');
 const main = document.querySelector('main');
 
+//TODO: close overlay clicking outside box
 export class UiTaskController {
   constructor() {
     this.projectController = ProjectController.getInstance();

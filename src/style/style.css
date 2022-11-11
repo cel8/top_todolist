@@ -294,6 +294,36 @@ nav, .nav-projects, .project-container {
   width: 2rem;
 }
 
+/* Project form */
+
+.manage-project-form {
+  display: flex;
+  gap: 0.5rem;
+  flex-direction: column;
+  justify-content: flex-start;
+  align-items: flex-start;
+}
+
+.manage-project-form > .complete-button {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.form-project-button {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.form-project-button > p {
+  font-weight: bold;
+  margin: 0;
+}
+
+.form-project-button > img {
+  width: 2rem;
+}
+
 /* Task */
 
 .manage-form-task {

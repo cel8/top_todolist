@@ -24,6 +24,19 @@ export class UiProjectController {
   #toggleEditing() {
     this.#isEdit = this.#isEdit ? false : true;
   }
+  #doDismissProjectForm() {
+    // Do not delete anything
+    if(!this.#isLocked()) return;
+    /* Get items */
+    const btnAddProject  = document.querySelector('.add-project-btn');
+    const formMngProject = document.querySelector('.manage-project-form');
+    // Remove all form content
+    domManager.removeAllChildNodes(formMngProject);
+    /* Toggle visibility */
+    domManager.toggleDisplayByNode(btnAddProject);
+    domManager.toggleDisplayByNode(formMngProject);
+    this.#toggleEditing();
+  }
   #doManageProjectForm(prjFormArgs) {
     /* Lock editing */
     if(this.#isLocked()) return;
@@ -75,15 +88,17 @@ export class UiProjectController {
     };
     /* Add input */
     const editTextPrjTitle = inputManager.createEditText('prjTitle', 'Project title:', 'Project name');
-    const editTextPrjDescr = inputManager.createEditText('prjDescription', 'Project description:', 'Project description');
+    const editTextPrjDescr = inputManager.createEditText('prjDescription', 'Project description:', 'Project description', false);
     const btnCancel        = inputManager.createTextButton('btnCancel', 'Cancel', 'form-project-button', cbEventCancel);
     const btnSubmit        = inputManager.createTextButton('btnSubmit', 'Submit', 'form-project-button', cbEventSubmit, formMngProject);
+    const divCompleteBtn   = domManager.createNode('div', 'complete-button');
     domManager.addNodeChild(formMngProject, editTextPrjTitle.label);
     domManager.addNodeChild(formMngProject, editTextPrjTitle.input);
     domManager.addNodeChild(formMngProject, editTextPrjDescr.label);
     domManager.addNodeChild(formMngProject, editTextPrjDescr.input);
-    domManager.addNodeChild(formMngProject, btnCancel.input);
-    domManager.addNodeChild(formMngProject, btnSubmit.input);
+    domManager.addNodeChild(formMngProject, divCompleteBtn);
+    domManager.addNodeChild(divCompleteBtn, btnSubmit.input);
+    domManager.addNodeChild(divCompleteBtn, btnCancel.input);
     // Set value when editing
     if(prjFormArgs.isEdit) {
       editTextPrjTitle.input.value = project.getTitle;
@@ -111,7 +126,7 @@ export class UiProjectController {
     }
   }
   #doOpenProject(projectTitle) {
-    // TODO: stop editing #isEdit
+    this.#doDismissProjectForm();
     this.uiTaskController.doLoadProjectTask(projectTitle);
   }
   doAddProjectUI(parentContainer, projectTitle) {

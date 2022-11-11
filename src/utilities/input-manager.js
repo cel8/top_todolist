@@ -10,6 +10,9 @@ export function createEditText(editTextID, placeHolderText, labelText = null, re
   input.required = required;
   /* Set label when node exists */
   if(label) {
+    if(required) {
+      domManager.createAddNode('span', label, 'required', null, '*');
+    }
     label.htmlFor = editTextID;
     input.setAttribute('name', editTextID);
   }

@@ -76,12 +76,21 @@ export class UiController {
   }
   #doLoadOverlay() {
     const overlay = document.querySelector('#overlay');
-    const divOverlay = domManager.createAddNode('div', overlay);
+    const divOverlay = domManager.createAddNode('div', overlay, 'overlay-popup');
+    const formOverlay = domManager.createAddNode('form', divOverlay, 'manage-form-task');
+    const displayOverlay = domManager.createAddNode('div', divOverlay, 'manage-details-task');
     // Hide overlay
     domManager.toggleDisplayByNode(overlay);
-    domManager.toggleDisplayByNode(domManager.createAddNode('form', divOverlay, 'manage-form-task'));
-    domManager.toggleDisplayByNode(domManager.createAddNode('div', divOverlay, 'manage-details-task'));
+    domManager.toggleDisplayByNode(formOverlay);
+    domManager.toggleDisplayByNode(displayOverlay);
     this.uiTaskController.doCreateTaskDetails();
+    document.addEventListener('click', (e) => {
+      if(e.target.id === 'overlay') { // Close overlay
+        domManager.toggleDisplayByNode(overlay);
+        if(formOverlay.style.display !== 'none') domManager.toggleDisplayByNode(formOverlay);
+        if(displayOverlay.style.display !== 'none') domManager.toggleDisplayByNode(displayOverlay);
+      }
+    })
   }
   doLoadUI() {
     this.#doLoadHeader();

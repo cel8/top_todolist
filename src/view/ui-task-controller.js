@@ -13,7 +13,6 @@ import { DataSubscriber } from 'Controller/data-subscriber';
 const overlay = document.querySelector('#overlay');
 const main = document.querySelector('main');
 
-//TODO: close overlay clicking outside box
 export class UiTaskController {
   constructor() {
     this.projectController = ProjectController.getInstance();
@@ -102,7 +101,6 @@ export class UiTaskController {
     // Cancel event
     const cbEventCancel = cbFinalizeForm;
     // Submit event
-    // TODO: need to implement form validation
     const cbEventSubmit = (e) => {
       e.preventDefault();
       // Fill parent and project title for each case      

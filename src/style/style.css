@@ -143,6 +143,22 @@ header {
 
 main {
   grid-row-start: 2;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+}
+
+.home {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.big-icon {
+  width: 12rem;
 }
 
 /* Overlay */
@@ -259,7 +275,8 @@ nav, .nav-projects, .project-container {
 
 /* Project buttons */
 
-.project-button {
+.project-button,
+.task-type-icon {
   display: flex;
   align-items: center;
   gap: 0.5rem;
@@ -267,11 +284,13 @@ nav, .nav-projects, .project-container {
   background-color: white;
 }
 
-.project-button > p {
+.project-button > p,
+.task-type-icon > p {
   font-weight: bold;
 }
 
-.project-button > img {
+.project-button > img,
+.task-type-icon > img {
   width: 2rem;
 }
 
@@ -294,6 +313,19 @@ nav, .nav-projects, .project-container {
 .task-item {
   display: flex;
   gap: 1rem;
+}
+
+.task-item.complete {
+  opacity: .5;
+}
+
+.task-item.expired > .task-duedate {
+  color: red;
+}
+
+.task-item.complete > .task-title{
+  text-decoration: line-through;
+  color: black;
 }
 
 /* Task buttons */

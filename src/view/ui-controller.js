@@ -14,6 +14,7 @@ import { UiTaskController } from 'View/ui-task-controller.js';
 import { taskFetchDate } from 'Controller/task-controller.js';
 
 const body = document.querySelector('body');
+const main = document.querySelector('main');
 
 export class UiController {
   constructor() {
@@ -30,16 +31,24 @@ export class UiController {
     }));
     domManager.addNodeChild(header, btnManager.createImageButton('home-outline.svg', 'header-button', () => {
       this.uiTaskController.doRemoveProject();
+      this.#doCreateHome();
     }));
-    domManager.createAddNodeImg('todo-list.gif', 'todo-list', header, 'icon');
-    domManager.createAddNode('p', header, 'main-text', null, 'Task list');
     domManager.addNodeChild(header, btnManager.createButton('Create task', 'plus-circle-outline.svg', 'header-button', () => {
       this.uiTaskController.doCreateTask();
     }));
     domManager.addNodeChild(body, header);
   }
+  #doCreateHome() {
+    // Style the flexbox
+    main.style.justifyContent = 'center';
+    const divHome = domManager.createAddNode('div', main, 'home');
+    domManager.createAddNode('h1', divHome, 'main-text', null, 'ToDo.Tme');
+    domManager.createAddNode('h2', divHome, 'main-text', null, 'Edit your daily task with notes or checklist.');
+    domManager.createAddNodeImg('todo-list.gif', 'todo-list', divHome, 'big-icon');
+  }
   #doLoadMainContent() {
     this.#doCreateNavBar();
+    this.#doCreateHome();
   }
   #doCreateNavBar() {
     /* Create navigation bar */

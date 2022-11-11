@@ -5,8 +5,9 @@ import * as btnManager from 'Utilities/button.js';
 import * as inputManager from 'Utilities/input-manager.js';
 import { taskPriority, taskType } from 'Modules/task.js';
 import 'Assets/images/svg/close-circle.svg';
+import 'Assets/images/svg/format-list-checkbox.svg';
+import 'Assets/images/svg/note-text-outline.svg';
 import _ from 'lodash';
-import { compareAsc } from 'date-fns'
 import { DataSubscriber } from 'Controller/data-subscriber';
 
 const overlay = document.querySelector('#overlay');
@@ -193,6 +194,8 @@ export class UiTaskController {
       checkListTasks.splice(0, checkListTasks.length);
       editTextTaskNote.input.value = '';
       if(switchTaskType.checkbox.checked) {
+        btnTaskNote.input.disabled  = true;
+        btnTaskCheckList.input.disabled  = false;
         // Insert add new item in checklist
         domManager.addNodeChild(divOptional, inputManager.createButton('addTaskItem', 'Add item in checklist', 'plus-circle-outline.svg', 'task-button', () => {
           // Fill last item first
@@ -204,6 +207,8 @@ export class UiTaskController {
       } else {
         // Add edit box
         domManager.addNodeChild(divOptional, editTextTaskNote.input);
+        btnTaskNote.input.disabled  = false;
+        btnTaskCheckList.input.disabled  = true;
       }
     };
     // Project selection
@@ -230,8 +235,10 @@ export class UiTaskController {
         inputManager.createRadioButton(`priority-${taskPriority[property]}`, property, null, cbEventEditPriority, (property === taskPriority.low))
       );
     }
-    // TODO: only the switch is not clear enough, because it does not tell to the user about the task type (not user friendly)
+    const divSwitchTaskType = domManager.createAddNode('div', divInput, 'task-type-container');
+    const btnTaskNote       = inputManager.createButton('btnNoteID', 'Note', 'note-text-outline.svg', 'task-type-icon');
     const switchTaskType    = inputManager.createSwitchButton('switchTaskType', true, 'Change task type', cbEventChangeTaskType);
+    const btnTaskCheckList  = inputManager.createButton('btnCheckListID', 'Checklist', 'format-list-checkbox.svg', 'task-type-icon');
     const divOptional       = domManager.createNode('div', 'optional-content');
     const editTextTaskNote  = inputManager.createEditText('taskNote', 'Task notes', null, false);
     const checkListTasks    = [];
@@ -247,7 +254,11 @@ export class UiTaskController {
       if(projectTask.getType === taskType.note) {
         editTextTaskNote.input.value = (projectTask.getNote ? projectTask.getNote : '');
         domManager.addNodeChild(divOptional, editTextTaskNote.input);
+        btnTaskNote.input.disabled  = false;
+        btnTaskCheckList.input.disabled  = true;
       } else {
+        btnTaskNote.input.disabled  = true;
+        btnTaskCheckList.input.disabled  = false;
         // Insert add new item in checklist
         domManager.addNodeChild(divOptional, inputManager.createButton('addTaskItem', 'Add item in checklist', 'plus-circle-outline.svg', 'task-button', () => {
           // Fill last item first
@@ -277,11 +288,18 @@ export class UiTaskController {
     domManager.addNodeChild(divInput, divPriority);
     domManager.addNodeChild(divPriority, pTaskPriority);
     radioBtnPriority.forEach(item => domManager.addNodeChild(divPriority, item.input));
-    domManager.addNodeChild(divInput, switchTaskType.label);
-    domManager.addNodeChild(divInput, switchTaskType.input);
+    domManager.addNodeChild(divSwitchTaskType, btnTaskNote.input);
+    domManager.addNodeChild(divSwitchTaskType, switchTaskType.label);
+    domManager.addNodeChild(divSwitchTaskType, switchTaskType.input);
+    domManager.addNodeChild(divSwitchTaskType, btnTaskCheckList.input);
+    domManager.addNodeChild(divInput, divSwitchTaskType);
     domManager.addNodeChild(divInput, divOptional);
     domManager.addNodeChild(formMngTask, divInput);
-    if(!taskFormArgs.isEdit) domManager.addNodeChild(divOptional, editTextTaskNote.input);
+    if(!taskFormArgs.isEdit) {
+      domManager.addNodeChild(divOptional, editTextTaskNote.input);
+      btnTaskNote.input.disabled  = false;
+      btnTaskCheckList.input.disabled  = true;
+    }
     domManager.addNodeChild(formMngTask, btnCancel.input);
     domManager.addNodeChild(formMngTask, btnSubmit.input);
   }
@@ -329,7 +347,7 @@ export class UiTaskController {
     const taskDueDate = divMngTaskDetails.querySelector('.task-details-duedate');
     taskDueDate.textContent                                                  = task.getDueDate && task.getDueDate !== '' ? task.getDueDate 
                                                                                                                          : 'No due date';
-    if(task.getExpired) { // TODO: should take care about task completation (when done and expired => done must survive)
+    if(task.getExpired) {
       taskDueDate.classList.add('expired');
     } else {
       taskDueDate.classList.remove('expired');
@@ -407,7 +425,13 @@ export class UiTaskController {
     };
     const checkBoxDone = inputManager.createCheckBox('checkBoxDone', null, () => {
       this.taskController.changeTaskState(taskFormArgs.projectTitle, taskFormArgs.taskID, checkBoxDone.input.checked);
+      taskFormArgs.divTask.classList.toggle('complete');
     }, task.getDone);
+    if(task.getDone) {
+      taskFormArgs.divTask.classList.add('complete');
+    } else {
+      taskFormArgs.divTask.classList.remove('complete');
+    }
     const pTaskTitle   = domManager.createNodeContent('p', task.getTitle, 'task-title');
     const pTaskDueDate = domManager.createNodeContent('p', task.getDueDate ? task.getDueDate : 'No due date', 'task-duedate');
     taskFormArgs.divTask.classList.toggle(taskFormArgs.priorityLevel);
@@ -474,6 +498,8 @@ export class UiTaskController {
     }
   }
   doLoadProjectTask(projectTitle) {
+    // Style the flexbox
+    main.style.justifyContent = 'flex-start';
     // Disable due date mode
     this.dueDateView.active = false;
     this.dueDateView.mode = undefined;
@@ -541,6 +567,8 @@ export class UiTaskController {
     return divTaskContainer;
   }
   doLoadTasksByDueDate(mode) {
+    // Style the flexbox
+    main.style.justifyContent = 'flex-start';
     // Disable due date mode
     this.dueDateView.active = true;
     this.dueDateView.mode = mode;

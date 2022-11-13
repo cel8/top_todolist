@@ -32,6 +32,24 @@ export function editButtonText(btn, text = '') {
   }
 }
 
+export function editButtonImage(btn, svgIconFileName = null) {
+  const btnText    = btn.querySelector('p');
+  const btnImgNode = btn.querySelector('.icon');
+  if(btnImgNode) {
+    if(!svgIconFileName) {
+      btnImgNode.remove();
+    } else {
+      domManager.updateNodeImg(svgIconFileName, btnImgNode);
+    }
+  } else {
+    // Insert icon when exist
+    if(svgIconFileName) {
+      const altText = btnText ? btnText.textContent : '';
+      domManager.createAddNodeImg(svgIconFileName, altText, btn, 'icon');
+    }
+  }
+}
+
 export function createImageButton(svgIconFileName, className = null, cbEvent = undefined) {
   return createButton('', svgIconFileName, className, cbEvent)
 }

@@ -16,65 +16,112 @@
   font-family: 'Roboto';
   font-style: normal;
   font-weight: 300;
-  src: url('../assets/fonts/roboto-v30-latin-300.eot'); /* IE9 Compat Modes */
+  src: url('Assets/fonts/roboto-v30-latin-300.eot'); /* IE9 Compat Modes */
   src: local(''),
-       url('../assets/fonts/roboto-v30-latin-300.eot?#iefix') format('embedded-opentype'), /* IE6-IE8 */
-       url('../assets/fonts/roboto-v30-latin-300.woff2') format('woff2'), /* Super Modern Browsers */
-       url('../assets/fonts/roboto-v30-latin-300.woff') format('woff'), /* Modern Browsers */
-       url('../assets/fonts/roboto-v30-latin-300.ttf') format('truetype'), /* Safari, Android, iOS */
-       url('../assets/fonts/roboto-v30-latin-300.svg#Roboto') format('svg'); /* Legacy iOS */
-} /* TODO: FIXME: fix these relative paths */
+       url('Assets/fonts/roboto-v30-latin-300.eot?#iefix') format('embedded-opentype'), /* IE6-IE8 */
+       url('Assets/fonts/roboto-v30-latin-300.woff2') format('woff2'), /* Super Modern Browsers */
+       url('Assets/fonts/roboto-v30-latin-300.woff') format('woff'), /* Modern Browsers */
+       url('Assets/fonts/roboto-v30-latin-300.ttf') format('truetype'), /* Safari, Android, iOS */
+       url('Assets/fonts/roboto-v30-latin-300.svg#Roboto') format('svg'); /* Legacy iOS */
+}
 /* roboto-regular - latin */
 @font-face {
   font-family: 'Roboto';
   font-style: normal;
   font-weight: 400;
-  src: url('../assets/fonts/roboto-v30-latin-regular.eot'); /* IE9 Compat Modes */
+  src: url('Assets/fonts/roboto-v30-latin-regular.eot'); /* IE9 Compat Modes */
   src: local(''),
-       url('../assets/fonts/roboto-v30-latin-regular.eot?#iefix') format('embedded-opentype'), /* IE6-IE8 */
-       url('../assets/fonts/roboto-v30-latin-regular.woff2') format('woff2'), /* Super Modern Browsers */
-       url('../assets/fonts/roboto-v30-latin-regular.woff') format('woff'), /* Modern Browsers */
-       url('../assets/fonts/roboto-v30-latin-regular.ttf') format('truetype'), /* Safari, Android, iOS */
-       url('../assets/fonts/roboto-v30-latin-regular.svg#Roboto') format('svg'); /* Legacy iOS */
+       url('Assets/fonts/roboto-v30-latin-regular.eot?#iefix') format('embedded-opentype'), /* IE6-IE8 */
+       url('Assets/fonts/roboto-v30-latin-regular.woff2') format('woff2'), /* Super Modern Browsers */
+       url('Assets/fonts/roboto-v30-latin-regular.woff') format('woff'), /* Modern Browsers */
+       url('Assets/fonts/roboto-v30-latin-regular.ttf') format('truetype'), /* Safari, Android, iOS */
+       url('Assets/fonts/roboto-v30-latin-regular.svg#Roboto') format('svg'); /* Legacy iOS */
 }
 /* roboto-500 - latin */
 @font-face {
   font-family: 'Roboto';
   font-style: normal;
   font-weight: 500;
-  src: url('../assets/fonts/roboto-v30-latin-500.eot'); /* IE9 Compat Modes */
+  src: url('Assets/fonts/roboto-v30-latin-500.eot'); /* IE9 Compat Modes */
   src: local(''),
-       url('../assets/fonts/roboto-v30-latin-500.eot?#iefix') format('embedded-opentype'), /* IE6-IE8 */
-       url('../assets/fonts/roboto-v30-latin-500.woff2') format('woff2'), /* Super Modern Browsers */
-       url('../assets/fonts/roboto-v30-latin-500.woff') format('woff'), /* Modern Browsers */
-       url('../assets/fonts/roboto-v30-latin-500.ttf') format('truetype'), /* Safari, Android, iOS */
-       url('../assets/fonts/roboto-v30-latin-500.svg#Roboto') format('svg'); /* Legacy iOS */
+       url('Assets/fonts/roboto-v30-latin-500.eot?#iefix') format('embedded-opentype'), /* IE6-IE8 */
+       url('Assets/fonts/roboto-v30-latin-500.woff2') format('woff2'), /* Super Modern Browsers */
+       url('Assets/fonts/roboto-v30-latin-500.woff') format('woff'), /* Modern Browsers */
+       url('Assets/fonts/roboto-v30-latin-500.ttf') format('truetype'), /* Safari, Android, iOS */
+       url('Assets/fonts/roboto-v30-latin-500.svg#Roboto') format('svg'); /* Legacy iOS */
 }
 /* roboto-700 - latin */
 @font-face {
   font-family: 'Roboto';
   font-style: normal;
   font-weight: 700;
-  src: url('../assets/fonts/roboto-v30-latin-700.eot'); /* IE9 Compat Modes */
+  src: url('Assets/fonts/roboto-v30-latin-700.eot'); /* IE9 Compat Modes */
   src: local(''),
-       url('../assets/fonts/roboto-v30-latin-700.eot?#iefix') format('embedded-opentype'), /* IE6-IE8 */
-       url('../assets/fonts/roboto-v30-latin-700.woff2') format('woff2'), /* Super Modern Browsers */
-       url('../assets/fonts/roboto-v30-latin-700.woff') format('woff'), /* Modern Browsers */
-       url('../assets/fonts/roboto-v30-latin-700.ttf') format('truetype'), /* Safari, Android, iOS */
-       url('../assets/fonts/roboto-v30-latin-700.svg#Roboto') format('svg'); /* Legacy iOS */
+       url('Assets/fonts/roboto-v30-latin-700.eot?#iefix') format('embedded-opentype'), /* IE6-IE8 */
+       url('Assets/fonts/roboto-v30-latin-700.woff2') format('woff2'), /* Super Modern Browsers */
+       url('Assets/fonts/roboto-v30-latin-700.woff') format('woff'), /* Modern Browsers */
+       url('Assets/fonts/roboto-v30-latin-700.ttf') format('truetype'), /* Safari, Android, iOS */
+       url('Assets/fonts/roboto-v30-latin-700.svg#Roboto') format('svg'); /* Legacy iOS */
 }
 /* roboto-900 - latin */
 @font-face {
   font-family: 'Roboto';
   font-style: normal;
   font-weight: 900;
-  src: url('../assets/fonts/roboto-v30-latin-900.eot'); /* IE9 Compat Modes */
+  src: url('Assets/fonts/roboto-v30-latin-900.eot'); /* IE9 Compat Modes */
   src: local(''),
-       url('../assets/fonts/roboto-v30-latin-900.eot?#iefix') format('embedded-opentype'), /* IE6-IE8 */
-       url('../assets/fonts/roboto-v30-latin-900.woff2') format('woff2'), /* Super Modern Browsers */
-       url('../assets/fonts/roboto-v30-latin-900.woff') format('woff'), /* Modern Browsers */
-       url('../assets/fonts/roboto-v30-latin-900.ttf') format('truetype'), /* Safari, Android, iOS */
-       url('../assets/fonts/roboto-v30-latin-900.svg#Roboto') format('svg'); /* Legacy iOS */
+       url('Assets/fonts/roboto-v30-latin-900.eot?#iefix') format('embedded-opentype'), /* IE6-IE8 */
+       url('Assets/fonts/roboto-v30-latin-900.woff2') format('woff2'), /* Super Modern Browsers */
+       url('Assets/fonts/roboto-v30-latin-900.woff') format('woff'), /* Modern Browsers */
+       url('Assets/fonts/roboto-v30-latin-900.ttf') format('truetype'), /* Safari, Android, iOS */
+       url('Assets/fonts/roboto-v30-latin-900.svg#Roboto') format('svg'); /* Legacy iOS */
+}
+
+@import url('https://fonts.googleapis.com/css2?family=Roboto+Condensed&display=swap');
+
+:root {
+  /* Task priority color */
+  --color-critical: darkviolet;
+  --color-high: red;
+  --color-normal: orange;
+  --color-low: green;
+  --color-reset: white;
+  /* Expired color */
+  --color-expired: red;
+  /* Task completion color */
+  --color-task-empty: red;
+  --color-task-incomplete: rgb(235, 168, 0);
+  --color-task-complete: green;
+}
+
+:root.dark {
+  --color-primary-bg: #212121;
+  --color-secondary-bg: #000000;
+  --color-primary-fg: #B0BEC5;
+  --color-primary-text: #eeffff;
+  --color-secondary-text: #eeffff;
+  --icon-filter: invert(100%);
+  --color-inactive: #474747;
+  --color-active: #80cbc4;
+  --color-scroll-active: var(--color-primary-fg);
+  --color-scroll-inactive: rgba(176, 190, 197, 0.7);
+  /* Project specific */
+  --color-task-completion-border: white;
+}
+
+:root.light {
+  --color-primary-bg: #FAFAFA;
+  --color-secondary-bg: #B0BEC5;
+  --color-primary-fg: #546E7A;
+  --color-primary-text: #272727;
+  --color-secondary-text: #000000;
+  --icon-filter: invert(0%);
+  --color-inactive: #D2D4D5;
+  --color-active: #39ADB5;
+  --color-scroll-active: var(--color-primary-fg);
+  --color-scroll-inactive: rgba(84, 110, 122, 0.7);
+  /* Project specific */
+  --color-task-completion-border: black;
 }
 
 html, body {
@@ -84,6 +131,9 @@ html, body {
   padding: 0px;
   font-family: 'Roboto', sans-serif;
   text-align: center;
+  background-color: var(--color-primary-bg);
+  color: var(--color-primary-text);
+  scrollbar-color: var(--color-scroll-active) var(--color-scroll-inactive);
 }
 
 footer {
@@ -91,8 +141,9 @@ footer {
   left: 0;
   bottom: 0;
   width: 100%;
-  background-color: black;
-  color: white;
+  border-top: 0.1rem solid var(--color-primary-fg);
+  background-color: var(--color-secondary-bg);
+  color: var(--color-secondary-text);
   justify-content: center;
   align-self: center;
   align-items: center;
@@ -106,9 +157,6 @@ a {
 }
 
 /* Utilities */
-.icon {
-  width: 48px;
-}
 
 body {
   display: grid;
@@ -116,11 +164,42 @@ body {
   grid-template-columns: 0fr 1fr;
 }
 
+.required {
+  color: red;
+  padding-left: 0.2rem;
+}
+
+/* Theme */
+
+.header-button,
+.project-button,
+.task-type-icon,
+.task-button {
+  background-color: var(--color-primary-bg);
+}
+
+.header-button  > p,
+.project-button > p,
+.task-type-icon > p,
+.task-button    > p  {
+  font-weight: bold;
+  color: var(--color-primary-text);
+}
+
+.header-button  > img,
+.project-button > img,
+.task-type-icon > img,
+.task-button    > img  {
+  filter: var(--icon-filter);
+}
+
 /* Header bar */
 
 header {
   display: flex;
   grid-column-end: span 2;
+  padding: 1rem;
+  border-bottom: 0.1rem solid var(--color-primary-fg);
 }
 
 .header-button {
@@ -128,11 +207,10 @@ header {
   align-items: center;
   gap: 0.5rem;
   border: none;
-  background-color: white;
 }
 
-.header-button > p {
-  font-weight: bold;
+.header-button:nth-last-child(2) {
+  margin-left: auto;
 }
 
 .header-button > img {
@@ -148,6 +226,9 @@ main {
   align-items: center;
   justify-content: center;
   gap: 1rem;
+  height: 90vh;
+  max-height:90%;
+  overflow-y: auto;
 }
 
 .home {
@@ -179,8 +260,34 @@ main {
 .overlay-popup {
   position: relative;
   margin: 15% auto;
-  background-color: white;
-  width: 500px;
+  background-color: var(--color-primary-bg);
+  width: 550px;
+  border: var(--color-primary-fg) solid 0.2rem;
+  border-radius: 1rem;
+}
+
+/* Scrollbar */
+
+/* width */
+::-webkit-scrollbar {
+  width: 0.5rem;
+}
+
+/* Track */
+::-webkit-scrollbar-track {
+  background: rgba(0, 0, 0, 0);
+}
+
+/* Handle */
+::-webkit-scrollbar-thumb {
+  background: var(--color-scroll-active);
+  border-radius: 5rem;
+}
+
+/* Handle on hover */
+::-webkit-scrollbar-thumb:hover {
+  background: var(--color-scroll-inactive);
+  border-radius: 5rem;
 }
 
 /* Switch */
@@ -205,7 +312,7 @@ main {
   left: 0;
   right: 0;
   bottom: 0;
-  background-color: #ccc;
+  background-color: var(--color-inactive);
   -webkit-transition: .4s;
   transition: .4s;
 }
@@ -223,11 +330,11 @@ main {
 }
 
 input:checked + .slider {
-  background-color: #2196F3;
+  background-color: var(--color-active);
 }
 
 input:focus + .slider {
-  box-shadow: 0 0 1px #2196F3;
+  box-shadow: 0 0 1px var(--color-active);;
 }
 
 input:checked + .slider:before {
@@ -249,7 +356,7 @@ input:checked + .slider:before {
 
 nav {
   padding: 0.5rem 1rem;
-  border-right: 1px solid black;
+  border-right: 0.1rem solid var(--color-primary-fg);
   grid-column-start: 1;
   grid-column-end: 1;
   grid-row-start: 2;
@@ -262,10 +369,17 @@ nav, .nav-projects, .project-container {
   gap: 0.5rem;
 }
 
+.nav-projects {
+  height: 65vh;
+  width: 320px;
+  max-height:90%;
+  overflow-y: auto;
+}
+
 .nav-projects > p {
   font-weight: bold;
   font-size: large;
-  border-bottom: 1px solid black;
+  border-bottom: 0.1rem solid var(--color-primary-fg);
 }
 
 .project {
@@ -282,12 +396,6 @@ nav, .nav-projects, .project-container {
   align-items: center;
   gap: 0.5rem;
   border: none;
-  background-color: white;
-}
-
-.project-button > p,
-.task-type-icon > p {
-  font-weight: bold;
 }
 
 .project-button > img,
@@ -325,15 +433,258 @@ nav, .nav-projects, .project-container {
   width: 2rem;
 }
 
-/* Task */
+/* Project task completion */
 
-.manage-form-task {
+.task-completion {
+  border: 1px solid var(--color-task-completion-border);
+  padding: 0.3rem;
+  border-radius: 50%;
+  font-size: 10px;
+  width: 25px;
+  height: 23px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.task-completion.complete {
+  background-color: var(--color-task-complete);
+}
+
+.task-completion.incomplete {
+  background-color: var(--color-task-incomplete);
+}
+
+.task-completion.empty {
+  background-color: var(--color-task-empty);
+}
+
+/* Task form and details */
+
+.manage-form-task,
+.manage-details-task {
+  padding: 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.manage-form-task > div,
+.manage-details-task > div:first-child {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 1rem;
+}
+
+.manage-form-task > div:first-child,
+.manage-details-task > div:first-child  {
+  border-bottom: var(--color-primary-fg) solid 0.1rem;
+}
+
+.manage-form-task > div:first-child > :first-child,
+.manage-details-task > div:first-child > :first-child {
+  margin-right: auto;
+  font-weight: bolder;
+  font-size: x-large;
 }
 
 .task-form-container {
+  flex-direction: column;
+}
+
+label[for="taskDueDate"] {
+  font-size: large;
+  font-weight: bold;
+}
+
+.task-priority {
+  display: grid;
+  grid-template-columns: 0fr 0fr 0fr 0fr;
+  grid-template-rows: 1fr 1fr;
+  align-items: center;
+  column-gap: 0.5rem;
+  row-gap: 0.1rem;
+}
+
+.task-priority > :first-child {
+  grid-column-end: span 4;
+  font-size: large;
+  font-weight: bold;
+  margin: 0;
+}
+
+.radio-btn > input {
+  position: relative;
+  height: 1px;
+  width: 1px;
+  padding: 0;
+  margin: 0;
+  opacity: 0;
+}
+
+.radio-btn > label {
+  padding: 0.5rem;
+  border-radius: 1rem;
+  font-size: 1rem;
+  font-weight: 400;
+  text-transform: uppercase;
+  font-family: 'Roboto Condensed', sans-serif;
+}
+
+.radio-btn > label[for="priority-critical"] {
+  border: 0.1rem solid var(--color-critical);
+  color: var(--color-critical);
+}
+
+.radio-btn > label[for="priority-high"] {
+  border: 0.1rem solid var(--color-high);
+  color: var(--color-high);
+}
+
+.radio-btn > label[for="priority-normal"] {
+  border: 0.1rem solid var(--color-normal);
+  color: var(--color-normal);
+}
+
+.radio-btn > label[for="priority-low"] {
+  border: 0.1rem solid var(--color-low);
+  color: var(--color-low);
+}
+
+.radio-btn > input:hover+label,
+.radio-btn > input:checked+label {
+  color: var(--color-reset);
+}
+
+.radio-btn > input:hover+label[for="priority-critical"],
+.radio-btn > input:checked+label[for="priority-critical"] {
+  background-color: var(--color-critical);
+}
+
+.radio-btn > input:hover+label[for="priority-high"],
+.radio-btn > input:checked+label[for="priority-high"] {
+  background-color: var(--color-high);
+}
+
+.radio-btn > input:hover+label[for="priority-normal"],
+.radio-btn > input:checked+label[for="priority-normal"] {
+  background-color: var(--color-normal);
+}
+
+.radio-btn > input:hover+label[for="priority-low"],
+.radio-btn > input:checked+label[for="priority-low"] {
+  background-color: var(--color-low);
+}
+
+.task-type-container {
+  display: grid;
+  grid-template-columns: 0fr 0fr 0fr;
+  grid-template-rows: 1fr 1fr;
+  align-items: center;
+  gap: 0.2rem;
+}
+
+.task-type-container > :first-child {
+  grid-column-end: span 3;
+  font-size: large;
+  font-weight: bold;
+}
+
+.optional-content {
+  padding: 1rem;
+  overflow-y: auto;
+  height: 100px;
+  width: 350px;
   display: flex;
   flex-direction: column;
   align-items: center;
+  justify-content: flex-start;
+  gap: 0.5rem;
+}
+
+#taskNote {
+  height: 90px;
+  width: 300px;
+}
+
+.optional-content > div {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.optional-content > div > .task-button {
+  border: none;
+}
+
+.optional-content > div > .task-button > img {
+  width: 1.5rem;
+}
+
+/* Task details */
+
+.task-details-container {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  padding: 1.5rem;
+  overflow-y: auto;
+  height: 450px;
+  text-align: left;
+}
+
+.task-details-container > p {
+  margin-bottom: 0;
+}
+
+.task-details-container > p:nth-child(odd),
+.task-details-opt > p:first-child {
+  font-weight: bold;
+}
+
+.task-details-container > div:last-child {
+  grid-column-end: span 2;
+}
+
+.task-details-duedate.expired {
+  color: var(--color-expired);
+}
+
+.task-details-opt {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  align-items: flex-start;
+  gap: 1rem;
+}
+
+.task-details-opt > p:last-child {
+  margin-top: 0;
+}
+
+.task-activity {
+  display: flex;
+  gap: 1rem;
+  align-items: center;
+  justify-content: flex-start;
+}
+
+.task-activity > .task-button {
+  border: none;
+}
+
+/* Task item */
+
+.task-project > :first-child,
+.duedate-task-project > :first-child {
+  font-weight: bolder;
+  font-size: large;
+}
+
+.task-settings {
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+  gap: 2rem;
 }
 
 .task-container {
@@ -341,9 +692,13 @@ nav, .nav-projects, .project-container {
   flex-direction: column;
   gap: 0.5rem;
 }
+
 .task-item {
   display: flex;
   gap: 1rem;
+  padding: 1rem;
+  border: solid 0.2rem;
+  border-radius: 1rem;
 }
 
 .task-item.complete {
@@ -351,12 +706,35 @@ nav, .nav-projects, .project-container {
 }
 
 .task-item.expired > .task-duedate {
-  color: red;
+  color: var(--color-expired);
 }
 
 .task-item.complete > .task-title{
   text-decoration: line-through;
-  color: black;
+}
+
+.task-item.low {
+  border-color: var(--color-low);
+}
+
+.task-item.normal {
+  border-color: var(--color-normal);
+}
+
+.task-item.high {
+  border-color: var(--color-high);
+}
+
+.task-item.critical {
+  border-color: var(--color-critical);
+}
+
+/* Due date task */
+
+.duedate-task-container {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
 }
 
 /* Task buttons */
@@ -368,7 +746,6 @@ nav, .nav-projects, .project-container {
 }
 
 .task-button > p {
-  font-weight: bold;
   margin: 0;
 }
 

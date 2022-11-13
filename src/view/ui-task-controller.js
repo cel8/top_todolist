@@ -219,6 +219,7 @@ export class UiTaskController {
                                                                         : [ taskFormArgs.projectTitle ];
     option.selected = taskFormArgs.isEdit ? taskFormArgs.projectTitle : null;
     // Create input
+    const divHdrBar         = domManager.createNode('div');
     const pTaskTitle        = domManager.createNodeContent('p', 'Add a new task', 'add-new-task-title');
     const selectProject     = inputManager.createSelect('selectPrjID', option.values, option.selected);
     const btnClose          = inputManager.createImageButton('btnCancel', 'close-circle.svg', 'task-button', cbEventCancel);
@@ -241,6 +242,7 @@ export class UiTaskController {
     const divOptional       = domManager.createNode('div', 'optional-content');
     const editTextTaskNote  = inputManager.createEditText('taskNote', 'Task notes', null, false);
     const checkListTasks    = [];
+    const divCompleteBtn    = domManager.createNode('div', 'complete-button');
     const btnCancel         = inputManager.createTextButton('btnCancel', 'Cancel', 'task-button', cbEventCancel);
     const btnSubmit         = inputManager.createTextButton('btnSubmit', 'Submit', 'task-button', cbEventSubmit, formMngTask);
     // Set value when editing
@@ -277,9 +279,10 @@ export class UiTaskController {
       }
     }
     /* Add input child */
-    domManager.addNodeChild(formMngTask, pTaskTitle);
-    domManager.addNodeChild(formMngTask, selectProject.input);
-    domManager.addNodeChild(formMngTask, btnClose.input);
+    domManager.addNodeChild(formMngTask, divHdrBar);
+    domManager.addNodeChild(divHdrBar, pTaskTitle);
+    domManager.addNodeChild(divHdrBar, selectProject.input);
+    domManager.addNodeChild(divHdrBar, btnClose.input);
     domManager.addNodeChild(divInput, editTextTaskTitle.input);
     domManager.addNodeChild(divInput, editTextTaskDescr.input);
     domManager.addNodeChild(divInput, dueDateTask.label);
@@ -287,8 +290,8 @@ export class UiTaskController {
     domManager.addNodeChild(divInput, divPriority);
     domManager.addNodeChild(divPriority, pTaskPriority);
     radioBtnPriority.forEach(item => domManager.addNodeChild(divPriority, item.input));
-    domManager.addNodeChild(divSwitchTaskType, btnTaskNote.input);
     domManager.addNodeChild(divSwitchTaskType, switchTaskType.label);
+    domManager.addNodeChild(divSwitchTaskType, btnTaskNote.input);
     domManager.addNodeChild(divSwitchTaskType, switchTaskType.input);
     domManager.addNodeChild(divSwitchTaskType, btnTaskCheckList.input);
     domManager.addNodeChild(divInput, divSwitchTaskType);
@@ -299,34 +302,40 @@ export class UiTaskController {
       btnTaskNote.input.disabled  = false;
       btnTaskCheckList.input.disabled  = true;
     }
-    domManager.addNodeChild(formMngTask, btnCancel.input);
-    domManager.addNodeChild(formMngTask, btnSubmit.input);
+    domManager.addNodeChild(formMngTask, divCompleteBtn);
+    domManager.addNodeChild(divCompleteBtn, btnCancel.input);
+    domManager.addNodeChild(divCompleteBtn, btnSubmit.input);
   }
   doCreateTaskDetails() {
     const divMngTaskDetails = overlay.querySelector('.manage-details-task');
     // Create container content
+    const divHdrBar        = domManager.createNode('div');
     const pDetailsHdr      = domManager.createNodeContent('p', 'Task information');
     const btnClose         = inputManager.createImageButton('btnCancel', 'close-circle.svg', 'task-button');
     const divTaskDetails   = domManager.createNode('div', 'task-details-container');
     const pTaskTitle       = { label: domManager.createNodeContent('p', 'Title:'), data: domManager.createNode('p', 'task-details-title') };
     const pTaskDescription = { label: domManager.createNodeContent('p', 'Description:'), data: domManager.createNode('p', 'task-details-description') };
+    const pTaskState       = { label: domManager.createNodeContent('p', 'State:'), data: domManager.createNode('p', 'task-details-state') };
     const pTaskDueDate     = { label: domManager.createNodeContent('p', 'Due date:'), data: domManager.createNode('p', 'task-details-duedate') };
     const pTaskPriority    = { label: domManager.createNodeContent('p', 'Priority:'), data: domManager.createNode('p', 'task-details-priority') };
     const pTaskProject     = { label: domManager.createNodeContent('p', 'Project:'), data: domManager.createNode('p', 'task-details-project') };
     const divTaskOptional  = domManager.createNode('div', 'task-details-opt');
-    domManager.addNodeChild(divMngTaskDetails, pDetailsHdr);
-    domManager.addNodeChild(divMngTaskDetails, btnClose.input);
+    domManager.addNodeChild(divMngTaskDetails, divHdrBar);
+    domManager.addNodeChild(divHdrBar, pDetailsHdr);
+    domManager.addNodeChild(divHdrBar, btnClose.input);
     domManager.addNodeChild(divMngTaskDetails, divTaskDetails);
     domManager.addNodeChild(divTaskDetails, pTaskTitle.label);
     domManager.addNodeChild(divTaskDetails, pTaskTitle.data);
-    domManager.addNodeChild(divTaskDetails, pTaskDescription.label);
-    domManager.addNodeChild(divTaskDetails, pTaskDescription.data);
+    domManager.addNodeChild(divTaskDetails, pTaskProject.label);
+    domManager.addNodeChild(divTaskDetails, pTaskProject.data);
+    domManager.addNodeChild(divTaskDetails, pTaskState.label);
+    domManager.addNodeChild(divTaskDetails, pTaskState.data);
     domManager.addNodeChild(divTaskDetails, pTaskDueDate.label);
     domManager.addNodeChild(divTaskDetails, pTaskDueDate.data);
     domManager.addNodeChild(divTaskDetails, pTaskPriority.label);
     domManager.addNodeChild(divTaskDetails, pTaskPriority.data);
-    domManager.addNodeChild(divTaskDetails, pTaskProject.label);
-    domManager.addNodeChild(divTaskDetails, pTaskProject.data);
+    domManager.addNodeChild(divTaskDetails, pTaskDescription.label);
+    domManager.addNodeChild(divTaskDetails, pTaskDescription.data);
     domManager.addNodeChild(divTaskDetails, divTaskOptional);
     domManager.toggleDisplayByNode(divTaskOptional);
   }
@@ -343,9 +352,10 @@ export class UiTaskController {
     // Update details
     divMngTaskDetails.querySelector('.task-details-title').textContent       = task.getTitle;
     divMngTaskDetails.querySelector('.task-details-description').textContent = task.getDescription;
+    divMngTaskDetails.querySelector('.task-details-state').textContent = task.getDone ? 'complete' : 'incomplete';
     const taskDueDate = divMngTaskDetails.querySelector('.task-details-duedate');
     taskDueDate.textContent                                                  = task.getDueDate && task.getDueDate !== '' ? task.getDueDate 
-                                                                                                                         : 'No due date';
+                                                                                                                         : 'no due date';
     if(task.getExpired) {
       taskDueDate.classList.add('expired');
     } else {
@@ -425,6 +435,8 @@ export class UiTaskController {
     const checkBoxDone = inputManager.createCheckBox('checkBoxDone', null, () => {
       this.taskController.changeTaskState(taskFormArgs.projectTitle, taskFormArgs.taskID, checkBoxDone.input.checked);
       taskFormArgs.divTask.classList.toggle('complete');
+      if(checkBoxDone.input.checked) btnEdit.disabled = true;
+      else btnEdit.disabled = false;
     }, task.getDone);
     if(task.getDone) {
       taskFormArgs.divTask.classList.add('complete');
@@ -444,9 +456,11 @@ export class UiTaskController {
     domManager.addNodeChild(divTask, btnManager.createTextButton('details', 'task-button details', () => {
       this.#doOpenTaskDetails(taskFormArgs.projectTitle, taskFormArgs.taskID);
     }));
-    domManager.addNodeChild(divTask, btnManager.createImageButton('pencil-circle.svg', 'task-button', () => {
+    const btnEdit = btnManager.createImageButton('pencil-circle.svg', 'task-button', () => {
       this.#doManageTaskForm(taskFormArgs);
-    }));
+    });
+    if(task.getDone) btnEdit.disabled = true;
+    domManager.addNodeChild(divTask, btnEdit);
     domManager.addNodeChild(divTask, btnManager.createImageButton('delete-circle.svg', 'task-button', () => {
       if(this.taskController.remove(taskFormArgs.projectTitle, taskFormArgs.taskID)) {
         divTask.remove();
@@ -511,6 +525,7 @@ export class UiTaskController {
     // Load project title and description
     const divProject = domManager.createAddNode('div', main, 'task-project');
     const divTaskContainer = domManager.createNode('div', 'task-container');
+    const divTaskSettings = domManager.createNode('div', 'task-settings');
     const tasks = this.taskController.fetch(projectTitle);
     tasks.forEach(t => this.doAddTaskUI(divTaskContainer, projectTitle, t));
     domManager.addNodeChild(divProject, domManager.createNodeContent('p', projectTitle));
@@ -524,21 +539,21 @@ export class UiTaskController {
       });
     });
     btnAddTask.classList.add('add-task-btn');
-    domManager.addNodeChild(main, btnAddTask);
+    domManager.addNodeChild(divTaskSettings, btnAddTask);
     // Create a sort selector
     const option = [];
     for (const property in taskSortMode) {
       option.push(taskSortMode[property]);
     }
-    const selectSortType = inputManager.createSelect('selectSortTaskID', option, taskSortMode.addDateAscending, 'Sort');
+    const selectSortType = inputManager.createSelect('selectSortTaskID', option, taskSortMode.addDateAscending);
     selectSortType.input.onchange = () => {
       if(this.currentSortMode !== selectSortType.input.value) {
         this.currentSortMode = selectSortType.input.value;
         this.doReloadSorted(projectTitle, divTaskContainer, this.currentSortMode);
       }
     }
-    domManager.addNodeChild(main, selectSortType.label);
-    domManager.addNodeChild(main, selectSortType.input);
+    domManager.addNodeChild(divTaskSettings, selectSortType.input);
+    domManager.addNodeChild(main, divTaskSettings);
     domManager.addNodeChild(main, divTaskContainer);
     // Install expiration timer
     this.taskController.installExpirationTimer(new DataSubscriber(this.#doUpdateExpirationTasks));
@@ -589,3 +604,4 @@ export class UiTaskController {
     });
   }
 }
+

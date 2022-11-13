@@ -1,4 +1,4 @@
-import 'Style/style.css'; // TODO: manage style (totally incomplete).
+import 'Style/style.css'; // TODO: manage style (need responsive & animation for buttons).
 import * as domManager from 'Utilities/dom-manager.js';
 import * as btnManager from 'Utilities/button.js';
 import 'Assets/images/svg/menu.svg';
@@ -8,13 +8,18 @@ import 'Assets/images/todo-list.gif';
 import 'Assets/images/svg/calendar-today.svg';
 import 'Assets/images/svg/calendar-week.svg';
 import 'Assets/images/svg/calendar-month.svg';
+import 'Assets/images/svg/dark-theme.svg';
+import 'Assets/images/svg/light-theme.svg';
 import { setTimeout } from 'timers-promises';
 import { UiProjectController } from 'View/ui-project-controller';
 import { UiTaskController } from 'View/ui-task-controller.js';
 import { taskFetchDate } from 'Controller/task-controller.js';
 
+const root = document.documentElement;
 const body = document.querySelector('body');
 const main = document.querySelector('main');
+
+export const settings = { theme: 'dark' };
 
 export class UiController {
   constructor() {
@@ -36,7 +41,12 @@ export class UiController {
     domManager.addNodeChild(header, btnManager.createButton('Create task', 'plus-circle-outline.svg', 'header-button', () => {
       this.uiTaskController.doCreateTask();
     }));
-    domManager.addNodeChild(body, header);
+    const btnToggleTheme = btnManager.createImageButton(`${settings.theme}-theme.svg`, 'header-button', () => {
+      settings.theme = (settings.theme !== 'dark' ? 'dark' : 'light');
+      btnManager.editButtonImage(btnToggleTheme, `${settings.theme}-theme.svg`);
+      root.className = settings.theme;
+    });
+    domManager.addNodeChild(header, btnToggleTheme);
   }
   #doCreateHome() {
     // Style the flexbox
@@ -93,6 +103,8 @@ export class UiController {
     })
   }
   doLoadUI() {
+    // Set main root theme
+    root.className = settings.theme;
     this.#doLoadHeader();
     this.#doLoadOverlay();
     this.#doLoadMainContent();

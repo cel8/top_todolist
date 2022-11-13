@@ -90,8 +90,12 @@ export function createAddNodeImg(imgFileName, alt, father, className = null, id 
   return node;
 }
 
-export function updateNodeImg(imgFileName, father, selector) {
+export function updateNodeImgBySelector(imgFileName, father, selector) {
   const imgNode = father.querySelector(selector);
+  if(imgNode) imgNode.setAttribute('src', imagePath + imgFileName);
+}
+
+export function updateNodeImg(imgFileName, imgNode) {
   if(imgNode) imgNode.setAttribute('src', imagePath + imgFileName);
 }
 

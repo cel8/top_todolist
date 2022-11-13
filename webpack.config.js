@@ -22,7 +22,7 @@ module.exports = {
   plugins: [
     new CleanWebpackPlugin(),
     new HtmlWebpackPlugin({
-      title: 'WebPage Title',
+      title: 'ToDo.Tme',
       template: './src/index.html',
       favicon: './src/assets/icon/site.ico',
       inject: 'body',

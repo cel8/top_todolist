@@ -1,4 +1,4 @@
-import 'Style/style.css'; // TODO: manage style (need responsive & animation for buttons).
+import 'Style/style.css'; // TODO: manage style (need responsive).
 import * as domManager from 'Utilities/dom-manager.js';
 import * as btnManager from 'Utilities/button.js';
 import 'Assets/images/svg/menu.svg';

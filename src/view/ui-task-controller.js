@@ -243,8 +243,8 @@ export class UiTaskController {
     const editTextTaskNote  = inputManager.createEditText('taskNote', 'Task notes', null, false);
     const checkListTasks    = [];
     const divCompleteBtn    = domManager.createNode('div', 'complete-button');
-    const btnCancel         = inputManager.createTextButton('btnCancel', 'Cancel', 'task-button', cbEventCancel);
-    const btnSubmit         = inputManager.createTextButton('btnSubmit', 'Submit', 'task-button', cbEventSubmit, formMngTask);
+    const btnCancel         = inputManager.createTextButton('btnCancel', 'Cancel', 'form-task-button', cbEventCancel);
+    const btnSubmit         = inputManager.createTextButton('btnSubmit', 'Submit', 'form-task-button', cbEventSubmit, formMngTask);
     // Set value when editing
     if(taskFormArgs.isEdit) {
       editTextTaskTitle.input.value = projectTask.getTitle;
@@ -453,7 +453,7 @@ export class UiTaskController {
     domManager.addNodeChild(divTask, pTaskTitle);
     domManager.addNodeChild(divTask, pTaskDueDate);
     UiTaskController.#doExpireTask(taskFormArgs.divTask, taskFormArgs.expired);
-    domManager.addNodeChild(divTask, btnManager.createTextButton('details', 'task-button details', () => {
+    domManager.addNodeChild(divTask, btnManager.createTextButton('details', 'task-button-details', () => {
       this.#doOpenTaskDetails(taskFormArgs.projectTitle, taskFormArgs.taskID);
     }));
     const btnEdit = btnManager.createImageButton('pencil-circle.svg', 'task-button', () => {
